@@ -87,7 +87,7 @@ void init_game(Game * game) {
 void update_game(Game * game) {
     Row * player_row = &game->rows[game->y];
     Symbol player_symbol = player_row->items[game->x].symbol;
-    
+
     for (int i = 1; i < GAME_HEIGHT - 1; i++) {
         Row * row = &game->rows[i];
 
@@ -121,8 +121,8 @@ void update_game(Game * game) {
 }
 
 void render_game(Game * game) {
-    for (int i = 0, j; i < GAME_HEIGHT; i++) {
-        for (j = 0; j < GAME_WIDTH; j++) {
+    for (int i = 0; i < GAME_HEIGHT; i++) {
+        for (int j = 0; j < GAME_WIDTH; j++) {
             move(i, j);
             attron(COLOR_PAIR(game->rows[i].items[j].symbol));
             addch((char)game->rows[i].items[j].symbol);
@@ -145,10 +145,10 @@ void handle_key_down(Game * game, int keycode) {
         game->x += movex = -(game->x > 0);
     } else
     if (keycode == 'd') {
-        game->x += movex = (game->x + 1 < GAME_WIDTH);
+        game->x += movex = +(game->x + 1 < GAME_WIDTH);
     } else
     if (keycode == 's') {
-        game->y += movey = (game->y + 1 < GAME_HEIGHT);;
+        game->y += movey = +(game->y + 1 < GAME_HEIGHT);
     } else
     if (keycode == 'w') {
         game->y += movey = -(game->y > 0);
@@ -187,8 +187,8 @@ int main() {
     init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
 
     curs_set(0);
+    noecho();
     int key;
-    printf("%d\n", noecho());
     do {
         render_game(&game);
         refresh();
