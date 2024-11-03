@@ -9,46 +9,7 @@
 #include <curses.h>
 #endif
 
-#define GAME_WIDTH 10
-#define GAME_HEIGHT 10
-
-#define WINDOW_WIDTH GAME_WIDTH
-#define WINDOW_HEIGHT (GAME_HEIGHT >> 1)
-
-typedef enum {
-    Null  = ' ',
-    Frog  = '@',
-    Tree  = '^',
-    Water = '~',
-    Log   = '=',
-    Car   = '>',
-    Taxi  = 'T',
-    Curb  = '_',
-} Symbol;
-
-typedef struct {
-    Symbol symbol;
-    int color;
-} Cell;
-
-typedef enum {
-    Plains = 0,
-    Forest,
-    Road,
-    River,
-    RowType_Count
-} RowType;
-
-typedef struct {
-    RowType type;
-    Cell items[GAME_WIDTH];
-} Row;
-
-typedef struct {
-    int x, y;
-    Row rows[GAME_HEIGHT];
-    int over;
-} Game;
+#include "main.h"
 
 void init_row(Row * row) {
     switch (row->type) {
@@ -86,7 +47,6 @@ void init_game(Game * game) {
 
 void update_game(Game * game) {
     Row * player_row = &game->rows[game->y];
-    Symbol player_symbol = player_row->items[game->x].symbol;
 
     for (int i = 1; i < GAME_HEIGHT - 1; i++) {
         Row * row = &game->rows[i];
@@ -94,6 +54,7 @@ void update_game(Game * game) {
         switch (row->type) {
         case River:
         case Road:{
+            Symbol player_symbol = player_row->items[game->x].symbol;
             // move player along
             if (game->y == i) {
                 switch (player_symbol) {
@@ -104,7 +65,7 @@ void update_game(Game * game) {
                 case Car:
                 case Water:
                     game->over = 1;
-                    break;
+                    return;
                 default:
                     break;
                 }
@@ -120,38 +81,50 @@ void update_game(Game * game) {
     }
 }
 
+void render_cell(Symbol symbol, int y, int x) {
+    const char * text = Textures[symbol];
+
+    if (symbol < 1)
+        symbol = 1;
+
+    attron(COLOR_PAIR(symbol));
+
+    for (int j = 0; j < CELL_SIZE; j++) {
+        for (int i = 0; i < CELL_SIZE; i++) {
+            move(CELL_SIZE * y + i, CELL_SIZE * x + j);
+            addch(text[CELL_SIZE * i + j]);
+        }
+    }
+}
+
 void render_game(Game * game) {
     for (int i = 0; i < GAME_HEIGHT; i++) {
         for (int j = 0; j < GAME_WIDTH; j++) {
-            move(i, j);
-            attron(COLOR_PAIR(game->rows[i].items[j].symbol));
-            addch((char)game->rows[i].items[j].symbol);
+            Symbol symbol = game->rows[i].items[j].symbol;
+            render_cell(symbol, j, i);
         }
-        attron(COLOR_PAIR(Null));
-        addch('#');
+        render_cell(0, GAME_WIDTH, i);
     }
-    for (int i = 0; i < GAME_WIDTH + 1; i++) {
-        move(GAME_HEIGHT, i);
-        addch('#');
+    for (int i = 0; i <= GAME_WIDTH; i++) {
+        render_cell(0, i, GAME_HEIGHT);
     }
-    move(game->y, game->x);
-    attron(COLOR_PAIR(Frog));
-    addch((char)Frog);
+
+    render_cell(Frog, game->x, game->y);
 }
 
 void handle_key_down(Game * game, int keycode) {
     int movex = 0, movey = 0;
     if (keycode == 'a') {
-        game->x += movex = -(game->x > 0);
+        game->y += movey = -(game->y > 0);
     } else
     if (keycode == 'd') {
-        game->x += movex = +(game->x + 1 < GAME_WIDTH);
-    } else
-    if (keycode == 's') {
         game->y += movey = +(game->y + 1 < GAME_HEIGHT);
     } else
+    if (keycode == 's') {
+        game->x += movex = +(game->x + 1 < GAME_WIDTH);
+    } else
     if (keycode == 'w') {
-        game->y += movey = -(game->y > 0);
+        game->x += movex = -(game->x > 0);
     }
     // Collision detection.
     switch (game->rows[game->y].items[game->x].symbol) {
@@ -166,6 +139,8 @@ void handle_key_down(Game * game, int keycode) {
 
 int main() {
     srand(time(NULL));
+    srand(rand());
+    srand(rand());
     Game game = { 0 };
     for (int i = 0; i < GAME_HEIGHT; i++) {
         for (int j = 0; j < GAME_WIDTH; j++) {
@@ -190,11 +165,11 @@ int main() {
     noecho();
     int key;
     do {
+        update_game(&game);
         render_game(&game);
         refresh();
         key = getch();
         handle_key_down(&game, key);
-        update_game(&game);
     } while (!game.over);
     endwin();
     
