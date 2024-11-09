@@ -3,10 +3,15 @@
 #include "strip.h"
 #include "game.h"
 
-extern struct Strip*(*StripConstructors[])();
-extern size_t STRIP_COUNT;
-
 void init_game(struct Game * game) {
+    struct Strip*(*StripConstructors[])(struct Game *) = {
+        create_strip_river,
+        create_strip_road,
+        create_strip_forest,
+        _create_strip_common
+    };
+    size_t STRIP_COUNT = sizeof(StripConstructors) / sizeof(StripConstructors[0]);
+
     game->strips = malloc(GAME_HEIGHT * sizeof(struct Strip *));
     game->size.x = GAME_WIDTH;
     game->size.y = GAME_HEIGHT;

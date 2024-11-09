@@ -188,12 +188,3 @@ void destroy_strip(Strip * self) {
     free(self);
 }
 
-struct Strip*(*StripConstructors[])(struct Game *) = {
-    create_strip_river,
-    create_strip_road,
-    create_strip_forest,
-    _create_strip_common
-};
-
-size_t STRIP_COUNT = sizeof(StripConstructors) / sizeof(StripConstructors[0]);
-
