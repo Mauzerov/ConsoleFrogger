@@ -32,12 +32,12 @@ int main() {
     srand(time(NULL));
     srand(rand());
     srand(rand());
-
     struct Game game = { 0 };
 
     init_game(&game);
 
     initscr();
+    timeout(800); // TODO: Add Const/Define
     start_color();
 
     init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
@@ -51,25 +51,17 @@ int main() {
 
     curs_set(0);
     noecho();
-    int key;
+    int key = ERR;
 
+    int time_passed = 0;
     do {
-        fprintf(stderr, "Rendering\n");
+        fprintf(stderr, "Rendering %d\n", time_passed);
         render_game(&game);
-        refresh();
         key = getch();
+        refresh();
         handle_key_down(&game, key);
 
-        // handle_collisions()
-        // ?? how tf do i move along the Log thingy
-        //    with this impementation
-        //  - if TREE => undo movevemnt
-        //  - if WATER | CAR  => end game
-        //  - if LOG   | TAXI => move along ??
-        //    how do get the direction of movement
-
-        fprintf(stderr, "Updating\n");
-        update_game(&game);
+        update_game(&game);    
     } while (!game.over);
 
     destroy_game(&game);
