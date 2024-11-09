@@ -6,9 +6,9 @@
 #include "cell.h"
 #include "game.h"
 
-char symbols[]  = "# @&~=_OT";
 
 void render_cell (Cell  * cell, struct Game * game) {
+    static char symbols[]  = "# @&~=_OT";
     attron(COLOR_PAIR(cell->symbol));
     move(game->cursor.y + 1, game->cursor.x + 1);
     addch(symbols[cell->symbol]);
