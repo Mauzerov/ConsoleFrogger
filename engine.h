@@ -2,7 +2,7 @@
 #define ENGINE_H
 
 #ifdef _WIN32
-#include <conio.h>
+#error "No support for windows"
 #else
 #include <curses.h>
 #endif

@@ -20,7 +20,7 @@ void init_game(struct Game * game) {
     for (int i = 0; i < game->size.y; i++) {
         struct Strip * strip = StripConstructors[rand() % STRIP_COUNT](game);
 
-        // Force Movable Strip to be in opposite diretions
+        // Force Movable Strip to be in opposite directions
         if (prev_direction != 0 && strip->direction == prev_direction) {
             strip->direction *= -1;
         }
