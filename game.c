@@ -7,22 +7,24 @@ extern int read_leaderboard(FILE *, Player[LEADERBOARD_SIZE]);
 
 void render_leaderboard(struct Game * game, struct Point off) {
     (void)off; (void)game;
-    #if 0;
     FILE * file = fopen(LEADERBOARD_FILENAME, "r");
 
     if (file == NULL)
         return;
 
-    Player leaderboard[5] = { 0 };
-    int player_count = 0;
+    Player leaderboard[LEADERBOARD_SIZE] = { 0 };
+    int player_count = read_leaderboard(file, leaderboard);
 
-    while (fscanf(file, "%19s %lu",
-        leaderboard [player_count].name,
-        &leaderboard[player_count].score
-    ) == 2) player_count++;
-
-    qsort(leaderboard, player_count, sizeof(Player), order_players);
-    #endif
+    int posy = off.y + game->size.y + 2;
+    mvaddstr(posy - 1, off.x + game->size.x / 2 - 5, "LEADERBOARD");
+    
+    char leaderboard_line[40] = { 0 };
+    for (int i = 0; i < player_count; i++) {
+        int lenght = sprintf(leaderboard_line, "%d. %-20s: %05lu", i + 1,
+            leaderboard[i].name, leaderboard[i].score);
+        int posx = off.x + ((game->size.x - lenght) >> 1);
+        mvaddstr(posy + i, posx, leaderboard_line);
+    }
 }
 
 #define ConfigRead(config, field)          \
@@ -102,13 +104,8 @@ struct Point get_offset(struct Game * game) {
 
 void render_game_state(struct Game * game, struct Point off) {
     char buffer[100] = { 0 };
-    int lenght = sprintf(
-        buffer,
-        "Score: %05lu",
-        game->score
-    );
-    move(off.y + game->size.y + 1, off.x + ((game->size.x - lenght) >> 1));
-    addstr(buffer);
+    int lenght = sprintf(buffer, "Score: %05lu", game->score);
+    mvaddstr(off.y - 2, off.x + ((game->size.x - lenght) >> 1), buffer);
 }
 
 void render_border(struct Game * game, struct Point off) {

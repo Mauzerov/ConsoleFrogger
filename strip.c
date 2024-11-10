@@ -10,29 +10,10 @@
 void render_cell (Cell  * cell, struct Game * game) {
     static char symbols[]  = "# @&~=_OT";
     attron(COLOR_PAIR(cell->symbol));
-    move(game->cursor.y, game->cursor.x);
-    addch(symbols[cell->symbol]);
+    mvaddch(game->cursor.y, game->cursor.x, symbols[cell->symbol]);
 }
 
 void render_strip(Strip * self, struct Game * game) {
-    if (self->direction) {
-        int width = game->size.x;
-        int start, end;
-
-        if (self->direction == UPDATE_RIGHT) {
-            start = width - 1;
-            end = -self->direction;
-        } else {
-            start = 0;
-            end = width - 1 -self->direction;
-        }
-        static char symbols[]  = "# @&~=_OT";
-
-        for (int i = start; i != end; i -= self->direction) {
-            fprintf(stderr, "%c ", symbols[self->items[i].symbol]);
-        }
-        fprintf(stderr, "\n");
-    }
     for (int i = 0; i < game->size.x; i++) {
         render_cell(&self->items[i], game);
         game->cursor.x++;

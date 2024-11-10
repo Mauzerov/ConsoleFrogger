@@ -106,14 +106,7 @@ void handle_key_down(struct Game * game, int keycode) {
     }
 }
 
-int main() {
-    srand(time(NULL));
-    srand(rand());
-    srand(rand());
-    struct Game game = { 0 };
-
-    init_game(&game);
-
+void init_curses() {
     initscr();
     // timeout(800); // TODO: Add Const/Define 
     start_color();
@@ -124,16 +117,24 @@ int main() {
     init_pair(Water,  COLOR_CYAN  , COLOR_BLUE );
     init_pair(Log  ,  COLOR_YELLOW, COLOR_BLUE );
     init_pair(Car  ,  COLOR_RED   , COLOR_BLACK);
-    init_pair(Taxi ,  COLOR_GREEN , COLOR_BLACK);
+    init_pair(Taxi ,  COLOR_YELLOW, COLOR_BLACK);
     init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
 
     curs_set(0);
     noecho();
+}
+
+int main() {
+    srand(time(NULL));
+    srand(rand());
+    srand(rand());
+    struct Game game = { 0 };
+
+    init_game(&game);
+    init_curses();
     int key = ERR;
 
-    int time_passed = 0;
     do {
-        fprintf(stderr, "Rendering %d\n", time_passed);
         render_game(&game);
         key = getch();
         refresh();
@@ -142,6 +143,7 @@ int main() {
         update_game(&game);    
     } while (!game.over);
 
+    render_game(&game);
     if (game.over == WIN) {
         read_player_name(&game);
     }
