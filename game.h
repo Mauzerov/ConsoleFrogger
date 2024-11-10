@@ -25,6 +25,8 @@ struct Game {
 
 struct Point get_offset(struct Game *);
 
+void read_config_file(struct Game *);
+
 void init_game(struct Game *);
 
 void render_border(struct Game *, struct Point);

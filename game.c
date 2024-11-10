@@ -9,17 +9,13 @@ void read_config_file(struct Game * game) {
     FILE * file = fopen(CONFIG_FILE_NAME, "r");
 
     char buffer[20] = { 0 };
-
-    fprintf(stderr, "Readind Config File %p:\n", (void*)file);
-
+    
     if (file == NULL)
         return;
 
     while (fscanf(file, "%s", buffer) == 1) {
-        fprintf(stderr, "Found %s\n", buffer);
         if (strcmp(buffer, "BOARD_SIZE") == 0) {
             fscanf(file, "%d %d", &game->size.x, &game->size.y);
-            fprintf(stderr, "Loading Board Size\n");
         }
     }
 
