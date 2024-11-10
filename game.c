@@ -3,9 +3,11 @@
 #include "strip.h"
 #include "game.h"
 
+extern int read_leaderboard(FILE *, Player[LEADERBOARD_SIZE]);
+
 void render_leaderboard(struct Game * game, struct Point off) {
     (void)off; (void)game;
-    #if 0
+    #if 0;
     FILE * file = fopen(LEADERBOARD_FILENAME, "r");
 
     if (file == NULL)
