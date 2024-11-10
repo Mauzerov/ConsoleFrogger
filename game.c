@@ -15,8 +15,16 @@ void init_game(struct Game * game) {
     game->strips = malloc(GAME_HEIGHT * sizeof(struct Strip *));
     game->size.x = GAME_WIDTH;
     game->size.y = GAME_HEIGHT;
+
+    int prev_direction = 0;
     for (int i = 0; i < game->size.y; i++) {
         struct Strip * strip = StripConstructors[rand() % STRIP_COUNT](game);
+
+        // Force Movable Strip to be in opposite diretions
+        if (prev_direction != 0 && strip->direction == prev_direction) {
+            strip->direction *= -1;
+        }
+        prev_direction = strip->direction;
         game->strips[i] = strip;
     }
 }
@@ -60,7 +68,7 @@ void render_border(struct Game * game, struct Point off) {
 void render_game(struct Game * game) {
     struct Point off = get_offset(game);
     render_border(game, off);
-    
+
     game->cursor.y = off.y;
     for (int i = 0; i < game->size.y; i++) {
         game->cursor.x = off.x;

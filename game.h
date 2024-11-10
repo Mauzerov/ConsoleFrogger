@@ -20,7 +20,11 @@ struct Game {
     int over;
 };
 
+struct Point get_offset(struct Game *);
+
 void init_game(struct Game *);
+
+void render_border(struct Game *, struct Point);
 
 void render_game(struct Game *);
 
