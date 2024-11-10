@@ -37,7 +37,7 @@ int main() {
     init_game(&game);
 
     initscr();
-    timeout(800); // TODO: Add Const/Define 
+    // timeout(800); // TODO: Add Const/Define 
     start_color();
 
     init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);

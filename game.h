@@ -28,9 +28,9 @@ void render_border(struct Game *, struct Point);
 
 void render_game(struct Game *);
 
-void handle_collision_preupdate(struct Game *);
-
 void handle_collision_postupdate(struct Game *);
+
+void handle_collision_preupdate(struct Game *);
 
 void update_game(struct Game *);
 

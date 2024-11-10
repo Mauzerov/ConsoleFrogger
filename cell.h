@@ -18,6 +18,8 @@ struct Game;
 
 struct Cell {
     Symbol symbol;
+    int interval;
+    int velocity;
 };
 
 typedef struct Cell Cell;

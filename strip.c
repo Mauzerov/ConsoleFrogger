@@ -15,6 +15,24 @@ void render_cell (Cell  * cell, struct Game * game) {
 }
 
 void render_strip(Strip * self, struct Game * game) {
+    if (self->direction) {
+        int width = game->size.x;
+        int start, end;
+
+        if (self->direction == UPDATE_RIGHT) {
+            start = width - 1;
+            end = -self->direction;
+        } else {
+            start = 0;
+            end = width - 1 -self->direction;
+        }
+        static char symbols[]  = "# @&~=_OT";
+
+        for (int i = start; i != end; i -= self->direction) {
+            fprintf(stderr, "%c ", symbols[self->items[i].symbol]);
+        }
+        fprintf(stderr, "\n");
+    }
     for (int i = 0; i < game->size.x; i++) {
         render_cell(&self->items[i], game);
         game->cursor.x++;
@@ -42,16 +60,39 @@ Strip * _create_strip_common(struct Game * game) {
  **/
 
 void _update_strip_moveable(Strip * self, struct Game * game) {
-    int width = game->size.x;
     assert(self->direction != 0 && "Movable Strip cannot be static!");
+    assert(self->velocity && "Movable Strip cannot be static!");
+    
+    self->state = (self->state + 1) % self->velocity;
+    if (self->state != 0)
+        return;
+
+    int width = game->size.x;
 
     Cell *tmp = (self->direction == UPDATE_RIGHT)
         ? &self->items[width - 1]
         : &self->items[0];
     Cell cpy = *tmp;
 
-    int offset = (tmp != self->items);
 
+    int offset = (tmp != self->items);
+    // static char symbols[]  = "# @&~=_OT";
+    #if 0
+    Cell * element = tmp;
+    for (int index = 0; 
+        index < game->size.x - 1;
+        index++, element -= self->direction
+    ) {
+        Cell * next = element - self->direction;
+
+        // TODO: entity based updateding
+        
+        memcpy(element, next, sizeof(struct Cell));
+    }
+    // fprintf(stderr, "::\n");
+    self->items[(width - !offset) % width] = cpy;
+    return;
+    #endif
     memmove(
         self->items +  offset,
         self->items + !offset,
@@ -88,7 +129,8 @@ void add_entity(Strip * self, Entity * entity, Symbol bg, struct Game * game) {
             continue;
 
         for (unsigned j = 0; j < entity->width; j++) {
-            self->items[(index + j) % game->size.x].symbol = entity->symbol;
+            Cell * cell = &self->items[(index + j) % game->size.x];
+            memcpy(cell, entity, sizeof(Cell));
         }
         return;
     }
@@ -102,6 +144,7 @@ Strip * _create_strip_movable(
     Strip * self = _create_strip_common(game);
 
     self->direction = (rand() & 1) ? UPDATE_RIGHT : UPDATE_LEFT;
+    self->velocity  = (rand() % CHANCE_OF_SLOW_STRIP == 0) + 1;
     self->update = _update_strip_moveable;
 
     fill_strip(self, bg, game);
@@ -125,8 +168,8 @@ Strip * _create_strip_movable(
 
 Strip * create_strip_river(struct Game * game) {
     Entity fg[] = {
-        { Log, 2 },
-        { Log, 3 },
+        { Log, .width = 2 },
+        { Log, .width = 3 },
     };
     return _create_strip_movable(
         Water,
@@ -148,8 +191,9 @@ Strip * create_strip_river(struct Game * game) {
 
 Strip * create_strip_road(struct Game * game) {
     Entity fg[] = {
-        { Car, 1 },
-        { Taxi, 1 }
+        { Car,  .width = 1 },
+        { Car,  .width = 1 },
+        { Taxi, .width = 1 }
     };
     return _create_strip_movable(
         Curb,
@@ -170,7 +214,7 @@ Strip * create_strip_road(struct Game * game) {
 
 Strip * create_strip_forest(struct Game * game) {
     Entity fg[] = {
-        { Tree, 1 },
+        { Tree, .width = 1 },
     };
     Strip * self = _create_strip_common(game);
 

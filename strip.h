@@ -4,6 +4,8 @@
 #define UPDATE_LEFT -1
 #define UPDATE_RIGHT 1
 
+#define CHANCE_OF_SLOW_STRIP 4
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -23,6 +25,8 @@ struct Strip {
     void (*update)(struct Strip * self, struct Game * game);
     void (*render)(struct Strip * self, struct Game * game);
     int direction;
+    int state;
+    int velocity;
 };
 
 typedef struct Strip Strip;

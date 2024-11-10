@@ -21,7 +21,7 @@ void init_game(struct Game * game) {
         struct Strip * strip = StripConstructors[rand() % STRIP_COUNT](game);
 
         // Force Movable Strip to be in opposite directions
-        if (prev_direction != 0 && strip->direction == prev_direction) {
+        if (strip->direction == prev_direction) {
             strip->direction *= -1;
         }
         prev_direction = strip->direction;
@@ -52,17 +52,6 @@ void render_border(struct Game * game, struct Point off) {
             }
         }
     }
-    return;
-    game->cursor.x = off.x - 1;
-    game->cursor.y = off.y - 1;
-    for (int i = 0; i <= game->size.x + 1; i++, game->cursor.x++) {
-        render_cell(&border, game);
-    }
-    game->cursor.x = off.x - 1;
-    game->cursor.y = off.y + game->size.y;
-    for (int i = 0; i <= game->size.x + 1; i++, game->cursor.x++) {
-        render_cell(&border, game);        
-    }
 }
 
 void render_game(struct Game * game) {
@@ -78,19 +67,27 @@ void render_game(struct Game * game) {
 
     game->cursor.x = game->player.x + off.x;
     game->cursor.y = game->player.y + off.y;
-    Cell frog = (Cell) { Frog };
+    Cell frog = (Cell) { .symbol = Frog };
     render_cell(&frog, game);
     attron(COLOR_PAIR(Null));
 }
 
 void handle_collision_postupdate(struct Game * game) {
     Strip * strip = game->strips[game->player.y];
-    Symbol symbol = strip->items [game->player.x].symbol;
+    Symbol symbol = strip->items[game->player.x].symbol;
 
     switch (symbol) {
     case Water:
     case Car:
         game->over = 1;
+        break;
+    case Log:
+    case Taxi:
+        if (strip->state != 0)
+            break;
+        game->player.x = (
+            game->player.x + strip->direction + game->size.x
+        ) % game->size.x;
         break;
     default:
         break;
@@ -99,7 +96,7 @@ void handle_collision_postupdate(struct Game * game) {
 
 void handle_collision_preupdate(struct Game * game) {
     Strip * strip = game->strips[game->player.y];
-    Symbol symbol = strip->items [game->player.x].symbol;
+    Symbol symbol = strip->items[game->player.x].symbol;
 
     switch (symbol) {
     case Tree:
@@ -110,12 +107,6 @@ void handle_collision_preupdate(struct Game * game) {
         // if player move up/down on a moving strip they can hit a tree
         //    then they remain on the moving item
         handle_collision_preupdate(game);
-        break;
-    case Log:
-    case Taxi:
-        game->player.x = (
-            game->player.x + strip->direction + game->size.x
-        ) % game->size.x;
         break;
     default:
         break;
