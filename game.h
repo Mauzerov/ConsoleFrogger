@@ -16,7 +16,10 @@ struct Point {
 
 struct Game {
     struct Strip ** strips;
-    struct Point player, prev_move, size, cursor;
+    struct Point player,
+                 prev_move,
+                 size,
+                 cursor;
     int over;
 };
 

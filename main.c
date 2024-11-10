@@ -16,11 +16,11 @@ void handle_key_down(struct Game * game, int keycode) {
     } else
     if (keycode == 's') {
         game->player.y +=
-            game->prev_move.y = +(game->player.y + 1 < GAME_HEIGHT);
+            game->prev_move.y = +(game->player.y + 1 < game->size.y);
     } else
     if (keycode == 'd') {
         game->player.x +=
-            game->prev_move.x = +(game->player.x + 1 < GAME_WIDTH);
+            game->prev_move.x = +(game->player.x + 1 < game->size.x);
     } else
     if (keycode == 'a') {
         game->player.x +=

@@ -3,6 +3,30 @@
 #include "strip.h"
 #include "game.h"
 
+#define CONFIG_FILE_NAME "frogger.config"
+
+void read_config_file(struct Game * game) {
+    FILE * file = fopen(CONFIG_FILE_NAME, "r");
+
+    char buffer[20] = { 0 };
+
+    fprintf(stderr, "Readind Config File %p:\n", (void*)file);
+
+    if (file == NULL)
+        return;
+
+    while (fscanf(file, "%s", buffer) == 1) {
+        fprintf(stderr, "Found %s\n", buffer);
+        if (strcmp(buffer, "BOARD_SIZE") == 0) {
+            fscanf(file, "%d %d", &game->size.x, &game->size.y);
+            fprintf(stderr, "Loading Board Size\n");
+        }
+    }
+
+
+    fclose(file);
+}
+
 void init_game(struct Game * game) {
     struct Strip*(*StripConstructors[])(struct Game *) = {
         create_strip_river,
@@ -15,6 +39,8 @@ void init_game(struct Game * game) {
     game->strips = malloc(GAME_HEIGHT * sizeof(struct Strip *));
     game->size.x = GAME_WIDTH;
     game->size.y = GAME_HEIGHT;
+
+    read_config_file(game);
 
     int prev_direction = 0;
     for (int i = 0; i < game->size.y; i++) {
