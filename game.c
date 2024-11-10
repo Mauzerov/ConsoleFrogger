@@ -34,7 +34,7 @@ void read_config_file(struct Game * game) {
     fclose(file);
 }
 
-void init_game(struct Game * game) {
+void init_strips(struct Game * game) {
     struct Strip*(*StripConstructors[])(struct Game *) = {
         create_strip_river,
         create_strip_road,
@@ -43,15 +43,12 @@ void init_game(struct Game * game) {
     };
     size_t STRIP_COUNT = sizeof(StripConstructors) / sizeof(StripConstructors[0]);
 
-    game->strips = malloc(GAME_HEIGHT * sizeof(struct Strip *));
-    game->size.x = GAME_WIDTH;
-    game->size.y = GAME_HEIGHT;
-
-    game->player.y = game->size.y - 1;
-    read_config_file(game);
-
     int prev_direction = 0;
-    for (int i = 0; i < game->size.y - 1; i++) {
+    for (int i = 0; i < game->size.y; i++) {
+        if (i % (game->size.y - 1) == 0) {
+            game->strips[i] = create_strip_empty(game);
+            continue;
+        }
         struct Strip * strip = StripConstructors[rand() % STRIP_COUNT](game);
 
         // Force Movable Strip to be in opposite directions
@@ -61,7 +58,17 @@ void init_game(struct Game * game) {
         prev_direction = strip->direction;
         game->strips[i] = strip;
     }
-    game->strips[game->size.y - 1] = create_strip_empty(game);
+}
+
+void init_game(struct Game * game) {
+    game->strips = malloc(GAME_HEIGHT * sizeof(struct Strip *));
+    game->size.x = GAME_WIDTH;
+    game->size.y = GAME_HEIGHT;
+
+    game->player.y = game->size.y - 1;
+    read_config_file(game);
+
+    init_strips(game);
 }
 
 struct Point get_offset(struct Game * game) {
@@ -111,18 +118,17 @@ void handle_collision_postupdate(struct Game * game) {
     Strip * strip = game->strips[game->player.y];
     Symbol symbol = strip->items[game->player.x].symbol;
 
+    if (game->player.y == 0) {
+        // Win
+        game->over = 1;
+        return;
+    }
+
     switch (symbol) {
     case Water:
     case Car:
+        // Loss
         game->over = 1;
-        break;
-    case Log:
-    case Taxi:
-        if (strip->state != 0)
-            break;
-        game->player.x = (
-            game->player.x + strip->direction + game->size.x
-        ) % game->size.x;
         break;
     default:
         break;
@@ -142,6 +148,14 @@ void handle_collision_preupdate(struct Game * game) {
         // if player move up/down on a moving strip they can hit a tree
         //    then they remain on the moving item
         handle_collision_preupdate(game);
+        break;
+    case Log:
+    case Taxi:
+        if (strip->state != 0)
+            break;
+        game->player.x = (
+            game->player.x + strip->direction + game->size.x
+        ) % game->size.x;
         break;
     default:
         break;

@@ -51,5 +51,7 @@ Strip * create_strip_road(struct Game *);
 
 Strip * create_strip_forest(struct Game *);
 
+Strip * create_strip_empty(struct Game *);
+
 void destroy_strip(Strip *);
 #endif 
