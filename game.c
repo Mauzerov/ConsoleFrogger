@@ -21,31 +21,56 @@ void init_game(struct Game * game) {
     }
 }
 
-void render_border(struct Game * game) {
+struct Point get_offset(struct Game * game) {
+    int offx, offy;
+    getmaxyx(stdscr, offy, offx);
+    offy = (offy - game->size.y) / 2;
+    offx = (offx - game->size.x) / 2;
+    fprintf(stderr, "%d %d\n", offy, offx);
+    return (struct Point) { .x = offx, .y = offy };
+}
+
+void render_border(struct Game * game, struct Point off) {
     Cell border = { Border };
-    game->cursor.x = game->cursor.y = -1;
-    for (int i = 0; i <= game->size.x + 1; i++) {
-        render_cell(&border, game);
-        game->cursor.x++;
+    int height = game->size.y + 1;
+    int width  = game->size.x + 1;
+
+    for (int y = 0; y <= height; y++) {
+        for (int x = 0; x <= width; x++) {
+            if (!!(x % width) ^ !!(y % height)) {
+                game->cursor.x = off.x - 1 + x;
+                game->cursor.y = off.y - 1 + y;
+                render_cell(&border, game);
+            }
+        }
     }
-    game->cursor.y = game->size.y;
-    game->cursor.x = -1;
-    for (int i = 0; i <= game->size.x + 1; i++) {
+    return;
+    game->cursor.x = off.x - 1;
+    game->cursor.y = off.y - 1;
+    for (int i = 0; i <= game->size.x + 1; i++, game->cursor.x++) {
         render_cell(&border, game);
-        game->cursor.x++;
+    }
+    game->cursor.x = off.x - 1;
+    game->cursor.y = off.y + game->size.y;
+    for (int i = 0; i <= game->size.x + 1; i++, game->cursor.x++) {
+        render_cell(&border, game);        
     }
 }
 
 void render_game(struct Game * game) {
-    render_border(game);
-    game->cursor.y = 0;
+    struct Point off = get_offset(game);
+    render_border(game, off);
+    
+    game->cursor.y = off.y;
     for (int i = 0; i < game->size.y; i++) {
+        game->cursor.x = off.x;
         invoke(game->strips[i]->render, game->strips[i], game);
+        game->cursor.y++;
     }
-    memcpy(&game->cursor, &game->player, sizeof(struct Point));
-    Cell frog = (Cell) {
-        Frog
-    };
+
+    game->cursor.x = game->player.x + off.x;
+    game->cursor.y = game->player.y + off.y;
+    Cell frog = (Cell) { Frog };
     render_cell(&frog, game);
     attron(COLOR_PAIR(Null));
 }

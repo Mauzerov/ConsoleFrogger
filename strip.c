@@ -10,17 +10,15 @@
 void render_cell (Cell  * cell, struct Game * game) {
     static char symbols[]  = "# @&~=_OT";
     attron(COLOR_PAIR(cell->symbol));
-    move(game->cursor.y + 1, game->cursor.x + 1);
+    move(game->cursor.y, game->cursor.x);
     addch(symbols[cell->symbol]);
 }
 
 void render_strip(Strip * self, struct Game * game) {
-    game->cursor.x = 0;
     for (int i = 0; i < game->size.x; i++) {
         render_cell(&self->items[i], game);
         game->cursor.x++;
     }
-    game->cursor.y++;
 }
 
 Strip * _create_strip_common(struct Game * game) {

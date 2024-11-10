@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#define GAME_WIDTH  10
+#define GAME_WIDTH  20
 #define GAME_HEIGHT 10
 
 #define CARS_PER_STRIP  2
