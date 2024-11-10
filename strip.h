@@ -23,8 +23,7 @@ struct Strip {
     void (*update)(struct Strip * self, struct Game * game);
     void (*render)(struct Strip * self, struct Game * game);
     int direction;
-    int state;
-    int velocity;
+    int state, velocity;
 };
 
 typedef struct Strip Strip;

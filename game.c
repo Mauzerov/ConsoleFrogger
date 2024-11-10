@@ -3,20 +3,38 @@
 #include "strip.h"
 #include "game.h"
 
-#define ConfigRead(config, field)          \
-    if (strcmp(#field, buffer) == 0) {     \
-        fscanf(file, "%d", &config.field); \
-    }                                                   
-#define CONFIG_FILE_NAME "frogger.config"
-
-void read_config_file(struct Game * game) {
-    FILE * file = fopen(CONFIG_FILE_NAME, "r");
-
-    char buffer[20] = { 0 };
+void render_leaderboard(struct Game * game, struct Point off) {
+    (void)off; (void)game;
+    #if 0
+    FILE * file = fopen(LEADERBOARD_FILENAME, "r");
 
     if (file == NULL)
         return;
 
+    Player leaderboard[5] = { 0 };
+    int player_count = 0;
+
+    while (fscanf(file, "%19s %lu",
+        leaderboard [player_count].name,
+        &leaderboard[player_count].score
+    ) == 2) player_count++;
+
+    qsort(leaderboard, player_count, sizeof(Player), order_players);
+    #endif
+}
+
+#define ConfigRead(config, field)          \
+    if (strcmp(#field, buffer) == 0) {     \
+        fscanf(file, "%d", &config.field); \
+    }
+#define CONFIG_FILE_NAME "frogger.config"
+
+void read_config_file(struct Game * game) {
+    FILE * file = fopen(CONFIG_FILE_NAME, "r");
+    if (file == NULL)
+        return;
+
+    char buffer[20] = { 0 };
     while (fscanf(file, "%s", buffer) == 1) {
         if (strcmp(buffer, "BOARD_SIZE") == 0) {
             fscanf(file, "%d %d", &game->size.x, &game->size.y);
@@ -29,8 +47,6 @@ void read_config_file(struct Game * game) {
         ConfigRead(game->config, TREES_PER_STRIP);
         ConfigRead(game->config, CHANCE_OF_SLOW_STRIP);
     }
-
-    fprintf(stderr, "%d\n", game->config.CARS_PER_STRIP);
     fclose(file);
 }
 
@@ -38,8 +54,9 @@ void init_strips(struct Game * game) {
     struct Strip*(*StripConstructors[])(struct Game *) = {
         create_strip_river,
         create_strip_road,
+        create_strip_road,
         create_strip_forest,
-        _create_strip_common
+        create_strip_empty
     };
     size_t STRIP_COUNT = sizeof(StripConstructors) / sizeof(StripConstructors[0]);
 
@@ -74,10 +91,22 @@ void init_game(struct Game * game) {
 struct Point get_offset(struct Game * game) {
     int offx, offy;
     getmaxyx(stdscr, offy, offx);
-    offy = (offy - game->size.y) / 2;
-    offx = (offx - game->size.x) / 2;
-    fprintf(stderr, "%d %d\n", offy, offx);
-    return (struct Point) { .x = offx, .y = offy };
+
+    return (struct Point) {
+        .x = (offx - game->size.x) / 2,
+        .y = (offy - game->size.y) / 2,
+    };
+}
+
+void render_game_state(struct Game * game, struct Point off) {
+    char buffer[100] = { 0 };
+    int lenght = sprintf(
+        buffer,
+        "Score: %05lu",
+        game->score
+    );
+    move(off.y + game->size.y + 1, off.x + ((game->size.x - lenght) >> 1));
+    addstr(buffer);
 }
 
 void render_border(struct Game * game, struct Point off) {
@@ -99,6 +128,8 @@ void render_border(struct Game * game, struct Point off) {
 void render_game(struct Game * game) {
     struct Point off = get_offset(game);
     render_border(game, off);
+    render_game_state(game, off);
+    render_leaderboard(game, off);
 
     game->cursor.y = off.y;
     for (int i = 0; i < game->size.y; i++) {
@@ -120,7 +151,7 @@ void handle_collision_postupdate(struct Game * game) {
 
     if (game->player.y == 0) {
         // Win
-        game->over = 1;
+        game->over = WIN;
         return;
     }
 
@@ -128,7 +159,7 @@ void handle_collision_postupdate(struct Game * game) {
     case Water:
     case Car:
         // Loss
-        game->over = 1;
+        game->over = LOSS;
         break;
     default:
         break;
@@ -163,6 +194,7 @@ void handle_collision_preupdate(struct Game * game) {
 }
 
 void update_game(struct Game * game) {
+    game->score++;
     handle_collision_preupdate(game);
     for (int i = 0; i < game->size.y; i++) {
         invoke(game->strips[i]->update, game->strips[i], game);

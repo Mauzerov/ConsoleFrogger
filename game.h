@@ -4,6 +4,12 @@
 #define GAME_WIDTH  20
 #define GAME_HEIGHT 10
 
+#define WIN 2
+#define LOSS 1
+
+#define LEADERBOARD_FILENAME "frogger.score"
+#define LEADERBOARD_SIZE 5
+
 #include "strip.h"
 
 struct Point {
@@ -25,7 +31,14 @@ struct Game {
                  cursor;
     struct Config config;
     int over;
+    unsigned long score;
 };
+
+struct Player {
+    char name[20];
+    unsigned long score;
+};
+typedef struct Player Player;
 
 struct Point get_offset(struct Game *);
 
