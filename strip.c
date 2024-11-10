@@ -74,25 +74,7 @@ void _update_strip_moveable(Strip * self, struct Game * game) {
         : &self->items[0];
     Cell cpy = *tmp;
 
-
-    int offset = (tmp != self->items);
-    // static char symbols[]  = "# @&~=_OT";
-    #if 0
-    Cell * element = tmp;
-    for (int index = 0; 
-        index < game->size.x - 1;
-        index++, element -= self->direction
-    ) {
-        Cell * next = element - self->direction;
-
-        // TODO: entity based updateding
-        
-        memcpy(element, next, sizeof(struct Cell));
-    }
-    // fprintf(stderr, "::\n");
-    self->items[(width - !offset) % width] = cpy;
-    return;
-    #endif
+    int offset = (tmp != self->items);    
     memmove(
         self->items +  offset,
         self->items + !offset,
