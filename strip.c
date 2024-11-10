@@ -126,7 +126,7 @@ Strip * _create_strip_movable(
     Strip * self = _create_strip_common(game);
 
     self->direction = (rand() & 1) ? UPDATE_RIGHT : UPDATE_LEFT;
-    self->velocity  = (rand() % CHANCE_OF_SLOW_STRIP == 0) + 1;
+    self->velocity  = (rand() % game->config.CHANCE_OF_SLOW_STRIP == 0) + 1;
     self->update = _update_strip_moveable;
 
     fill_strip(self, bg, game);
@@ -156,7 +156,7 @@ Strip * create_strip_river(struct Game * game) {
     return _create_strip_movable(
         Water,
         fg, sizeof(fg) / sizeof (fg[0]) ,
-        LOGS_PER_STRIP,
+        game->config.LOGS_PER_STRIP,
         game
     );
 }
@@ -180,7 +180,7 @@ Strip * create_strip_road(struct Game * game) {
     return _create_strip_movable(
         Curb,
         fg, sizeof(fg) / sizeof (fg[0]),
-        CARS_PER_STRIP,
+        game->config.CARS_PER_STRIP,
         game
     );
 }
@@ -200,10 +200,14 @@ Strip * create_strip_forest(struct Game * game) {
     };
     Strip * self = _create_strip_common(game);
 
-    for (int i = 0 ; i < TREES_PER_STRIP; i++) {
+    for (int i = 0 ; i < game->config.TREES_PER_STRIP; i++) {
         add_entity(self, fg, Null, game);
     }
     return self;
+}
+
+Strip * create_strip_empty(struct Game * game) {
+    return _create_strip_common(game);
 }
 
 void destroy_strip(Strip * self) {

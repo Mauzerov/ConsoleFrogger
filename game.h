@@ -4,14 +4,17 @@
 #define GAME_WIDTH  20
 #define GAME_HEIGHT 10
 
-#define CARS_PER_STRIP  2
-#define LOGS_PER_STRIP  2
-#define TREES_PER_STRIP 2
-
 #include "strip.h"
 
 struct Point {
     int x, y;
+};
+
+struct Config {
+    int CARS_PER_STRIP,
+        LOGS_PER_STRIP,
+        TREES_PER_STRIP,
+        CHANCE_OF_SLOW_STRIP;
 };
 
 struct Game {
@@ -20,6 +23,7 @@ struct Game {
                  prev_move,
                  size,
                  cursor;
+    struct Config config;
     int over;
 };
 

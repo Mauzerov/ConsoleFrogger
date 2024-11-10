@@ -4,8 +4,6 @@
 #define UPDATE_LEFT -1
 #define UPDATE_RIGHT 1
 
-#define CHANCE_OF_SLOW_STRIP 4
-
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>

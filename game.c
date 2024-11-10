@@ -3,13 +3,17 @@
 #include "strip.h"
 #include "game.h"
 
+#define ConfigRead(config, field)          \
+    if (strcmp(#field, buffer) == 0) {     \
+        fscanf(file, "%d", &config.field); \
+    }                                                   
 #define CONFIG_FILE_NAME "frogger.config"
 
 void read_config_file(struct Game * game) {
     FILE * file = fopen(CONFIG_FILE_NAME, "r");
 
     char buffer[20] = { 0 };
-    
+
     if (file == NULL)
         return;
 
@@ -17,9 +21,16 @@ void read_config_file(struct Game * game) {
         if (strcmp(buffer, "BOARD_SIZE") == 0) {
             fscanf(file, "%d %d", &game->size.x, &game->size.y);
         }
+        if (strcmp(buffer, "PLAYER_X") == 0) {
+            fscanf(file, "%d", &game->player.x);
+        }
+        ConfigRead(game->config, CARS_PER_STRIP);
+        ConfigRead(game->config, LOGS_PER_STRIP);
+        ConfigRead(game->config, TREES_PER_STRIP);
+        ConfigRead(game->config, CHANCE_OF_SLOW_STRIP);
     }
 
-
+    fprintf(stderr, "%d\n", game->config.CARS_PER_STRIP);
     fclose(file);
 }
 
@@ -36,10 +47,11 @@ void init_game(struct Game * game) {
     game->size.x = GAME_WIDTH;
     game->size.y = GAME_HEIGHT;
 
+    game->player.y = game->size.y - 1;
     read_config_file(game);
 
     int prev_direction = 0;
-    for (int i = 0; i < game->size.y; i++) {
+    for (int i = 0; i < game->size.y - 1; i++) {
         struct Strip * strip = StripConstructors[rand() % STRIP_COUNT](game);
 
         // Force Movable Strip to be in opposite directions
@@ -49,6 +61,7 @@ void init_game(struct Game * game) {
         prev_direction = strip->direction;
         game->strips[i] = strip;
     }
+    game->strips[game->size.y - 1] = create_strip_empty(game);
 }
 
 struct Point get_offset(struct Game * game) {
