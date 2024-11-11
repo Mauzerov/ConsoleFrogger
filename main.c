@@ -109,7 +109,7 @@ void handle_key_down(struct Game * game, int keycode) {
 
 void init_curses(const struct Config * config) {
     initscr();
-    timeout(config->TIMEOUT); // TODO: Add Const/Define 
+    timeout(config->TIMEOUT);
     start_color();
 
     init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
