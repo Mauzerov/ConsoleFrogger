@@ -66,6 +66,7 @@ void add_player_to_leaderboard(
 void read_player_name(struct Game * game) {
     echo();
     curs_set(1);
+    timeout(-1);
     struct Point off = get_offset(game);
 
     int posy = off.y + (game->size.y / 2) - 2;
@@ -106,9 +107,9 @@ void handle_key_down(struct Game * game, int keycode) {
     }
 }
 
-void init_curses() {
+void init_curses(const struct Config * config) {
     initscr();
-    // timeout(800); // TODO: Add Const/Define 
+    timeout(config->TIMEOUT); // TODO: Add Const/Define 
     start_color();
 
     init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
@@ -131,7 +132,7 @@ int main() {
     struct Game game = { 0 };
 
     init_game(&game);
-    init_curses();
+    init_curses(&game.config);
     int key = ERR;
 
     do {

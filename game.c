@@ -50,6 +50,7 @@ void read_config_file(struct Game * game) {
         ConfigRead(game->config, LOGS_PER_STRIP);
         ConfigRead(game->config, TREES_PER_STRIP);
         ConfigRead(game->config, CHANCE_OF_SLOW_STRIP);
+        ConfigRead(game->config, TIMEOUT);
     }
     fclose(file);
 }

@@ -20,7 +20,8 @@ struct Config {
     int CARS_PER_STRIP,
         LOGS_PER_STRIP,
         TREES_PER_STRIP,
-        CHANCE_OF_SLOW_STRIP;
+        CHANCE_OF_SLOW_STRIP,
+        TIMEOUT;
 };
 
 struct Game {
