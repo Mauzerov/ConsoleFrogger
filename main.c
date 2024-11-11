@@ -141,7 +141,7 @@ int main() {
         refresh();
         handle_key_down(&game, key);
 
-        update_game(&game);    
+        update_game(&game);
     } while (!game.over);
 
     render_game(&game);

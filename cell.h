@@ -1,6 +1,8 @@
 #ifndef CELL_H
 #define CELL_H
 
+typedef unsigned long long UID;
+
 typedef enum {
     Border = 0,
     Null = 1,
@@ -18,8 +20,7 @@ struct Game;
 
 struct Cell {
     Symbol symbol;
-    int interval;
-    int velocity;
+    UID uid;
 };
 
 typedef struct Cell Cell;

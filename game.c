@@ -83,12 +83,13 @@ void init_strips(struct Game * game) {
 }
 
 void init_game(struct Game * game) {
-    game->strips = malloc(GAME_HEIGHT * sizeof(struct Strip *));
     game->size.x = GAME_WIDTH;
     game->size.y = GAME_HEIGHT;
 
-    game->player.y = game->size.y - 1;
     read_config_file(game);
+    game->player.y = game->size.y - 1;
+
+    game->strips = malloc(game->size.y * sizeof(struct Strip *));
 
     init_strips(game);
 }
@@ -99,7 +100,7 @@ struct Point get_offset(struct Game * game) {
 
     return (struct Point) {
         .x = (offx - game->size.x) / 2,
-        .y = (offy - game->size.y) / 2,
+        .y = (offy - game->size.y) / 2 - 2,
     };
 }
 

@@ -20,14 +20,20 @@ void render_strip(Strip * self, struct Game * game) {
     }
 }
 
+void fill_strip(Strip * self, Symbol with, struct Game * game) {
+    self->bg = with;
+    for (int i = 0; i < game->size.x; i++) {
+        self->items[i].symbol = with;
+    }
+}
+
 Strip * _create_strip_common(struct Game * game) {
     Strip* self = malloc(sizeof(Strip));
     self->items = malloc(sizeof(struct Cell) * game->size.x);
     self->render = render_strip;
 
-    for (int i = 0; i < game->size.x; i++) {
-        self->items[i].symbol = Null;
-    }
+    fill_strip(self, Null, game);
+
     return self;
 }
 
@@ -61,14 +67,27 @@ void _update_strip_moveable(Strip * self, struct Game * game) {
         self->items + !offset,
         (width - 1) * sizeof(Cell)
     );
-
-    self->items[(width - !offset) % width] = cpy;
-}
-
-void fill_strip(Strip * self, Symbol with, struct Game * game) {
-    for (int i = 0; i < game->size.x; i++) {
-        self->items[i].symbol = with;
+    // tmp now becomes the symbol on the edge
+    if (self->entity_count == 0) {
+        fprintf(stderr, "Strip run out of entities\n");
+        endwin();
+        exit(0xF00DCAFE);
     }
+
+    if (cpy.uid != 0) {
+        if (cpy.uid != tmp->uid) {
+            Entity * entity = (Entity*)&cpy;
+            entity->width = 1;
+            int index = (width - !offset) % width;
+            // removed all elements of an entity
+            fprintf(stderr, "adding at: %d %u\n", index, cpy.symbol);
+            if (!add_entity_at(self, entity, self->bg, game, index))
+                self->entity_count--;
+            else return;
+        }
+        cpy = (Cell) { .symbol = self->bg };
+    }
+    self->items[(width - !offset) % width] = cpy;
 }
 
 int entity_fits(
@@ -84,19 +103,34 @@ int entity_fits(
     return 1;
 }
 
-void add_entity(Strip * self, Entity * entity, Symbol bg, struct Game * game) {
+int add_entity_at(
+    Strip * self,
+    Entity * entity,
+    Symbol bg,
+    struct Game * game,
+    int where
+) {
+    static UID uid = 0; 
     while (1) {
-        unsigned index = rand() % game->size.x;
+        unsigned index = (where == -1) ? rand() % game->size.x : where;
         
-        if (!entity_fits(self, entity, index, bg, game))
-            continue;
-
+        if (!entity_fits(self, entity, index, bg, game)) {
+            if (where == -1)
+                continue; // find new position
+            return 0; // failed to add an entity on speciefied position
+        }
+        entity->uid = ++uid;
         for (unsigned j = 0; j < entity->width; j++) {
             Cell * cell = &self->items[(index + j) % game->size.x];
             memcpy(cell, entity, sizeof(Cell));
         }
-        return;
+        return 1;
     }
+}
+
+
+int add_entity(Strip * self, Entity * entity, Symbol bg, struct Game * game) {
+    return add_entity_at(self, entity, bg, game, -1);
 }
 
 Strip * _create_strip_movable(
@@ -116,7 +150,7 @@ Strip * _create_strip_movable(
         Entity entity = fg[rand() % n_fg];
         add_entity(self, &entity, bg, game);
     }
-
+    self->entity_count = fg_count;
     return self;
 }
 

@@ -12,18 +12,23 @@
 #include "game.h"
 
 struct Game;
-    
+
+// NOTE: Entity should overload most (if not all) of Cell
 struct Entity {
     Symbol symbol;
+    UID uid;
     unsigned width;
 };
 
 struct Strip {
     struct Cell * items;
+    Symbol bg;
     void (*update)(struct Strip * self, struct Game * game);
     void (*render)(struct Strip * self, struct Game * game);
     int direction;
     int state, velocity;
+    int removed_elements;
+    int entity_count;
 };
 
 typedef struct Strip Strip;
@@ -40,7 +45,9 @@ void fill_strip(Strip *, Symbol, struct Game *);
 
 int entity_fits(Strip *, Entity *, unsigned, Symbol, struct Game *);
 
-void add_entity(Strip *, Entity *, Symbol, struct Game *);
+int add_entity_at(Strip *, Entity *, Symbol, struct Game *, int);
+
+int add_entity(Strip *, Entity *, Symbol, struct Game *);
 
 Strip * _create_strip_movable(Symbol, Entity *, size_t, size_t, struct Game *);
 
@@ -53,4 +60,5 @@ Strip * create_strip_forest(struct Game *);
 Strip * create_strip_empty(struct Game *);
 
 void destroy_strip(Strip *);
+
 #endif 
