@@ -27,7 +27,6 @@ struct Strip {
     void (*render)(struct Strip * self, struct Game * game);
     int direction;
     int state, velocity;
-    int removed_elements;
     int entity_count;
 };
 

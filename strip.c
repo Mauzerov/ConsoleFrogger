@@ -50,15 +50,14 @@ void _update_strip_moveable(Strip * self, struct Game * game) {
     assert(self->direction != 0 && "Movable Strip cannot be static!");
     assert(self->velocity && "Movable Strip cannot be static!");
     
-    self->state = (self->state + 1) % self->velocity;
-    if (self->state != 0)
+    if ((self->state = (self->state + 1) % self->velocity) != 0)
         return;
 
     int width = game->size.x;
 
     Cell *tmp = (self->direction == UPDATE_RIGHT)
-        ? &self->items[width - 1]
-        : &self->items[0];
+              ? &self->items[width - 1]
+              : &self->items[0];
     Cell cpy = *tmp;
 
     int offset = (tmp != self->items);    
@@ -73,21 +72,20 @@ void _update_strip_moveable(Strip * self, struct Game * game) {
         endwin();
         exit(0xF00DCAFE);
     }
-
+    int index = (width - !offset) % width;
+    // TODO: seperate code below
     if (cpy.uid != 0) {
         if (cpy.uid != tmp->uid) {
             Entity * entity = (Entity*)&cpy;
-            entity->width = 1;
-            int index = (width - !offset) % width;
-            // removed all elements of an entity
-            fprintf(stderr, "adding at: %d %u\n", index, cpy.symbol);
+            entity->width = 2;
+            
             if (!add_entity_at(self, entity, self->bg, game, index))
                 self->entity_count--;
             else return;
         }
         cpy = (Cell) { .symbol = self->bg };
     }
-    self->items[(width - !offset) % width] = cpy;
+    self->items[index] = cpy;
 }
 
 int entity_fits(
