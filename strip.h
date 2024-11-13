@@ -18,10 +18,12 @@ struct Entity {
     Symbol symbol;
     UID uid;
     unsigned width;
+    unsigned position;
+    struct Entity * next;
 };
 
 struct Strip {
-    struct Cell * items;
+    struct Entity * entities; // Linked List
     Symbol bg;
     void (*update)(struct Strip * self, struct Game * game);
     void (*render)(struct Strip * self, struct Game * game);
@@ -35,12 +37,11 @@ typedef struct Entity Entity;
 
 
 void render_strip(Strip *, struct Game *);
+void render_cell(Symbol, struct Game *);
 
 Strip * _create_strip_common();
 
 void _update_strip_moveable(Strip *, struct Game *);
-
-void fill_strip(Strip *, Symbol, struct Game *);
 
 int entity_fits(Strip *, Entity *, unsigned, Symbol, struct Game *);
 

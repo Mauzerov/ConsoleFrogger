@@ -25,7 +25,7 @@ struct Cell {
 
 typedef struct Cell Cell;
 
-void render_cell(Cell *, struct Game *);
+void render_symbol(Symbol, struct Game *);
 
 
 #endif

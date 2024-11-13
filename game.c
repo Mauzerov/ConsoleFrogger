@@ -111,7 +111,6 @@ void render_game_state(struct Game * game, struct Point off) {
 }
 
 void render_border(struct Game * game, struct Point off) {
-    Cell border = { Border };
     int height = game->size.y + 1;
     int width  = game->size.x + 1;
 
@@ -120,7 +119,8 @@ void render_border(struct Game * game, struct Point off) {
             if (!!(x % width) ^ !!(y % height)) {
                 game->cursor.x = off.x - 1 + x;
                 game->cursor.y = off.y - 1 + y;
-                render_cell(&border, game);
+                // render_cell(&border, game);
+                render_symbol(Border, game);
             }
         }
     }
@@ -141,56 +141,64 @@ void render_game(struct Game * game) {
 
     game->cursor.x = game->player.x + off.x;
     game->cursor.y = game->player.y + off.y;
-    Cell frog = (Cell) { .symbol = Frog };
-    render_cell(&frog, game);
+    // render_cell(&frog, game);
+    render_symbol(Frog, game);
     attron(COLOR_PAIR(Null));
 }
 
+// Todo: fix collistion detection to accomodate for entity width
 void handle_collision_postupdate(struct Game * game) {
     Strip * strip = game->strips[game->player.y];
-    Symbol symbol = strip->items[game->player.x].symbol;
-
+    struct Entity * head = strip->entities;
     if (game->player.y == 0) {
         // Win
         game->over = WIN;
         return;
-    }
-
-    switch (symbol) {
-    case Water:
-    case Car:
-        // Loss
-        game->over = LOSS;
-        break;
-    default:
-        break;
+    }   
+    while (head != NULL && head->position == (unsigned)game->player.x) {
+        Symbol symbol = head->symbol;    
+        if (head->position == (unsigned)game->player.x)
+        switch (symbol) {
+        case Water:
+        case Car:
+            // Loss
+            game->over = LOSS;
+            break;
+        default:
+            break;
+        }
+        head = head->next;
     }
 }
 
 void handle_collision_preupdate(struct Game * game) {
     Strip * strip = game->strips[game->player.y];
-    Symbol symbol = strip->items[game->player.x].symbol;
-
-    switch (symbol) {
-    case Tree:
-        assert(game->player.x || game->player.y);
-        game->player.x -= game->prev_move.x;
-        game->player.y -= game->prev_move.y;
-        memset(&game->prev_move, 0, sizeof(struct Point));
-        // if player move up/down on a moving strip they can hit a tree
-        //    then they remain on the moving item
-        handle_collision_preupdate(game);
-        break;
-    case Log:
-    case Taxi:
-        if (strip->state != 0)
+    struct Entity * head = strip->entities;
+    while (head != NULL) {
+        Symbol symbol = head->symbol;
+        if (head->position == (unsigned)game->player.x)
+        switch (symbol) {
+        case Tree:
+            assert(game->player.x || game->player.y);
+            game->player.x -= game->prev_move.x;
+            game->player.y -= game->prev_move.y;
+            memset(&game->prev_move, 0, sizeof(struct Point));
+            // if player move up/down on a moving strip they can hit a tree
+            //    then they remain on the moving item
+            handle_collision_preupdate(game);
             break;
-        game->player.x = (
-            game->player.x + strip->direction + game->size.x
-        ) % game->size.x;
-        break;
-    default:
-        break;
+        case Log:
+        case Taxi:
+            if (strip->state != 0)
+                break;
+            game->player.x = (
+                game->player.x + strip->direction + game->size.x
+            ) % game->size.x;
+            break;
+        default:
+            break;
+        }
+        head = head->next;
     }
 }
 
