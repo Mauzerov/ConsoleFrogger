@@ -11,6 +11,9 @@
 #define LEADERBOARD_SIZE 5
 
 #include "strip.h"
+#include "entity.h"
+
+typedef int(* CollideFunction)(struct Entity*, struct Game *);
 
 struct Point {
     int x, y;
@@ -41,6 +44,8 @@ struct Player {
 };
 typedef struct Player Player;
 
+int moveby(void *, int, int);
+
 struct Point get_offset(struct Game *);
 
 void read_config_file(struct Game *);
@@ -51,9 +56,9 @@ void render_border(struct Game *, struct Point);
 
 void render_game(struct Game *);
 
-void handle_collision_postupdate(struct Game *);
+void handle_game_over(struct Game *, CollideFunction);
 
-void handle_collision_preupdate(struct Game *);
+void handle_entity_collision(struct Game *, CollideFunction);
 
 void update_game(struct Game *);
 

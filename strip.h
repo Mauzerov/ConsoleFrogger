@@ -10,23 +10,19 @@
 
 #include "cell.h"
 #include "game.h"
+#include "entity.h"
 
 struct Game;
 
-// NOTE: Entity should overload most (if not all) of Cell
-struct Entity {
-    Symbol symbol;
-    UID uid;
-    unsigned width;
-    unsigned position;
-    struct Entity * next;
-};
+typedef int(* CollideFunction)(struct Entity*, struct Game *);
 
 struct Strip {
     struct Entity * entities; // Linked List
-    Symbol bg;
-    void (*update)(struct Strip * self, struct Game * game);
-    void (*render)(struct Strip * self, struct Game * game);
+    Symbol bg;                // Strip can only have one backgroud (more is unnecessary)
+    void (*update)   (struct Strip * self, struct Game * game);
+    void (*render)   (struct Strip * self, struct Game * game);
+     CollideFunction collide;
+    // Movable Strip definition
     int direction;
     int state, velocity;
     int entity_count;
@@ -43,7 +39,7 @@ Strip * _create_strip_common();
 
 void _update_strip_moveable(Strip *, struct Game *);
 
-int entity_fits(Strip *, Entity *, unsigned, Symbol, struct Game *);
+int is_entity_at(Entity *, unsigned, struct Game *);
 
 int add_entity_at(Strip *, Entity *, Symbol, struct Game *, int);
 

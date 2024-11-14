@@ -5,6 +5,7 @@
 #include "strip.h"
 #include "cell.h"
 #include "game.h"
+#include "entity.h"
 
 void render_symbol(Symbol symbol, struct Game * game) {
     static char symbols[]  = "# @&~=_OT";
@@ -30,12 +31,9 @@ void render_strip(Strip * self, struct Game * game) {
 
 Strip * _create_strip_common(struct Game * game) {
     Strip* self = malloc(sizeof(Strip));
-    // self->items = malloc(sizeof(struct Cell) * game->size.x);
-    self->entities = NULL; // malloc(sizeof(struct Entity));
     self->render = render_strip;
     self->bg = Null;
     (void)game;
-
     return self;
 }
 
@@ -49,30 +47,40 @@ Strip * _create_strip_common(struct Game * game) {
  **/
 
 void _update_strip_moveable(Strip * self, struct Game * game) {
-    assert(self->direction != 0 && "Movable Strip cannot be static!");
-    assert(self->velocity && "Movable Strip cannot be static!");
+    assert(self->direction != 0 && self->velocity &&
+            "Movable Strip cannot be static!");
     
     if ((self->state = (self->state + 1) % self->velocity) != 0)
         return;
 
+    int player_moved = game->strips[game->player.y] != self;
+    // if strip should be moved; move all its entities
     struct Entity * head = self->entities;
     while (head != NULL) {
-        head->position = (head->position + game->size.x + self->direction) % game->size.x;
+        // and move player along if wasn't moved already
+        if (!player_moved && is_entity_at(head, game->player.x, game)) {
+            moveby(&game->player.x, self->direction, game->size.x);
+            player_moved = 1;
+        }
+        moveby(&head->position, self->direction, game->size.x);
         head = head->next;
     }
+
 }
 
-int entity_fits(
-    Strip * self, Entity * entity,
-    unsigned index, Symbol bg,
+int is_entity_at(
+    Entity * entity,
+    unsigned index,
     struct Game * game
 ) {
-    (void)self;
-    (void)entity;
-    (void)index;
-    (void)bg;
-    (void)game;
-    return 1;    
+    // Todo: Validate this logic
+    // maybe convert it to math (2 conditions)
+    // checking if a point is in a range that is periodic is weird
+    for (unsigned i = 0; i < entity->width; i++) {
+        if ((entity->position + i) % game->size.x == index)
+            return 1;
+    }
+    return 0;
 }
 
 int add_entity_at(
@@ -141,15 +149,18 @@ Strip * _create_strip_movable(
 
 Strip * create_strip_river(struct Game * game) {
     Entity fg[] = {
-        { Log, .width = 2 },
-        { Log, .width = 3 },
+        { Log, .width = 2, },
+        { Log, .width = 3, },
     };
-    return _create_strip_movable(
+
+    Strip * self = _create_strip_movable(
         Water,
         fg, sizeof(fg) / sizeof (fg[0]) ,
         game->config.LOGS_PER_STRIP,
         game
     );
+    self->collide = entity_oncollide_death;
+    return self;
 }
 
 
@@ -164,8 +175,8 @@ Strip * create_strip_river(struct Game * game) {
 
 Strip * create_strip_road(struct Game * game) {
     Entity fg[] = {
-        { Car,  .width = 1 },
-        { Car,  .width = 1 },
+        { Car,  .width = 1, .on_collide = entity_oncollide_death },
+        { Car,  .width = 1, .on_collide = entity_oncollide_death },
         { Taxi, .width = 1 }
     };
     return _create_strip_movable(
@@ -187,7 +198,7 @@ Strip * create_strip_road(struct Game * game) {
 
 Strip * create_strip_forest(struct Game * game) {
     Entity fg[] = {
-        { Tree, .width = 1 },
+        { Tree, .width = 1, .on_collide = entity_oncollide_tree },
     };
     Strip * self = _create_strip_common(game);
 

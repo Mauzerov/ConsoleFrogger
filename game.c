@@ -55,6 +55,12 @@ void read_config_file(struct Game * game) {
     fclose(file);
 }
 
+int moveby(void * _pos, int by, int size) {
+    int * pos = (int*)_pos; // cba with this warning
+    *pos = (*pos + by + size) % size;
+    return *pos;
+}
+
 void init_strips(struct Game * game) {
     struct Strip*(*StripConstructors[])(struct Game *) = {
         create_strip_river,
@@ -141,13 +147,11 @@ void render_game(struct Game * game) {
 
     game->cursor.x = game->player.x + off.x;
     game->cursor.y = game->player.y + off.y;
-    // render_cell(&frog, game);
     render_symbol(Frog, game);
     attron(COLOR_PAIR(Null));
 }
 
-// Todo: fix collistion detection to accomodate for entity width
-void handle_collision_postupdate(struct Game * game) {
+void handle_game_over(struct Game * game, CollideFunction death) {
     Strip * strip = game->strips[game->player.y];
     struct Entity * head = strip->entities;
     if (game->player.y == 0) {
@@ -155,60 +159,49 @@ void handle_collision_postupdate(struct Game * game) {
         game->over = WIN;
         return;
     }   
-    while (head != NULL && head->position == (unsigned)game->player.x) {
-        Symbol symbol = head->symbol;    
-        if (head->position == (unsigned)game->player.x)
-        switch (symbol) {
-        case Water:
-        case Car:
-            // Loss
-            game->over = LOSS;
-            break;
-        default:
-            break;
+    unsigned collitions = 0;
+    while (head != NULL) {
+        // TODO: below is ugly (find a better solution)
+        if (is_entity_at(head, game->player.x, game))
+        if (head->on_collide == death){
+            invoke(head->on_collide, head, game);
+            collitions++;
         }
         head = head->next;
     }
+    // if (!collitions)
+    //     invoke(strip->collide, NULL, game);
 }
 
-void handle_collision_preupdate(struct Game * game) {
+void handle_entity_collision(struct Game * game, CollideFunction death) {
     Strip * strip = game->strips[game->player.y];
     struct Entity * head = strip->entities;
+    unsigned collitions = 0;
     while (head != NULL) {
-        Symbol symbol = head->symbol;
-        if (head->position == (unsigned)game->player.x)
-        switch (symbol) {
-        case Tree:
-            assert(game->player.x || game->player.y);
-            game->player.x -= game->prev_move.x;
-            game->player.y -= game->prev_move.y;
-            memset(&game->prev_move, 0, sizeof(struct Point));
-            // if player move up/down on a moving strip they can hit a tree
-            //    then they remain on the moving item
-            handle_collision_preupdate(game);
-            break;
-        case Log:
-        case Taxi:
-            if (strip->state != 0)
-                break;
-            game->player.x = (
-                game->player.x + strip->direction + game->size.x
-            ) % game->size.x;
-            break;
-        default:
-            break;
-        }
+        if (is_entity_at(head, game->player.x, game)) {
+            fprintf(stderr, "Collided at with %d\n", game->player.x);
+            if (head->on_collide != death) {
+                invoke(head->on_collide, head, game);
+                fprintf(stderr, "Collided with %u\n", head->symbol);
+                collitions++;
+            }    
+        }        
         head = head->next;
+    }
+    if (!collitions){
+        invoke(strip->collide, NULL, game);
     }
 }
 
 void update_game(struct Game * game) {
     game->score++;
-    handle_collision_preupdate(game);
+    // non game over
+    handle_entity_collision(game, entity_oncollide_death);
     for (int i = 0; i < game->size.y; i++) {
         invoke(game->strips[i]->update, game->strips[i], game);
     }
-    handle_collision_postupdate(game);
+    // game over 
+    handle_game_over(game, entity_oncollide_death);
 }
 
 void destroy_game(struct Game * game) {
