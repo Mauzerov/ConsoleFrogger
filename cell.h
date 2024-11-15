@@ -16,11 +16,17 @@ typedef enum {
     Symbol_Count
 } Symbol;
 
+typedef enum {
+    Safe = 0,
+    Solid, // Blocking
+    Evil,
+} CellType;
+
 struct Game;
 
 struct Cell {
     Symbol symbol;
-    UID uid;
+    CellType type;
 };
 
 typedef struct Cell Cell;

@@ -13,8 +13,6 @@
 #include "strip.h"
 #include "entity.h"
 
-typedef int(* CollideFunction)(struct Entity*, struct Game *);
-
 struct Point {
     int x, y;
 };
@@ -56,9 +54,7 @@ void render_border(struct Game *, struct Point);
 
 void render_game(struct Game *);
 
-void handle_game_over(struct Game *, CollideFunction);
-
-void handle_entity_collision(struct Game *, CollideFunction);
+unsigned resolve_player_collisions(struct Strip *, struct Game *);
 
 void update_game(struct Game *);
 

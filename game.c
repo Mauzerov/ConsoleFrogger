@@ -125,7 +125,6 @@ void render_border(struct Game * game, struct Point off) {
             if (!!(x % width) ^ !!(y % height)) {
                 game->cursor.x = off.x - 1 + x;
                 game->cursor.y = off.y - 1 + y;
-                // render_cell(&border, game);
                 render_symbol(Border, game);
             }
         }
@@ -151,57 +150,37 @@ void render_game(struct Game * game) {
     attron(COLOR_PAIR(Null));
 }
 
-void handle_game_over(struct Game * game, CollideFunction death) {
-    Strip * strip = game->strips[game->player.y];
-    struct Entity * head = strip->entities;
-    if (game->player.y == 0) {
-        // Win
-        game->over = WIN;
-        return;
-    }   
-    unsigned collitions = 0;
-    while (head != NULL) {
-        // TODO: below is ugly (find a better solution)
-        if (is_entity_at(head, game->player.x, game))
-        if (head->on_collide == death){
-            invoke(head->on_collide, head, game);
-            collitions++;
-        }
-        head = head->next;
-    }
-    // if (!collitions)
-    //     invoke(strip->collide, NULL, game);
-}
-
-void handle_entity_collision(struct Game * game, CollideFunction death) {
-    Strip * strip = game->strips[game->player.y];
+unsigned resolve_player_collisions(Strip * strip, struct Game * game) {
     struct Entity * head = strip->entities;
     unsigned collitions = 0;
     while (head != NULL) {
         if (is_entity_at(head, game->player.x, game)) {
-            fprintf(stderr, "Collided at with %d\n", game->player.x);
-            if (head->on_collide != death) {
-                invoke(head->on_collide, head, game);
-                fprintf(stderr, "Collided with %u\n", head->symbol);
-                collitions++;
-            }    
+            handle_entity_collision(head, game);
+            collitions++;
         }        
         head = head->next;
     }
-    if (!collitions){
-        invoke(strip->collide, NULL, game);
-    }
+    return collitions;
 }
 
 void update_game(struct Game * game) {
+    Strip * playerStrip = game->strips[game->player.y];
     game->score++;
+
+    if (game->player.y == 0) {
+        end_game(game, WIN);
+        return; // if player won no need to check collisions
+    }
     // non game over
-    handle_entity_collision(game, entity_oncollide_death);
+    if (resolve_player_collisions(playerStrip, game) == 0u)
+        invoke(playerStrip->collide, game);
+
     for (int i = 0; i < game->size.y; i++) {
         invoke(game->strips[i]->update, game->strips[i], game);
     }
     // game over 
-    handle_game_over(game, entity_oncollide_death);
+    if (resolve_player_collisions(playerStrip, game) == 0u)
+        invoke(playerStrip->collide, game);
 }
 
 void destroy_game(struct Game * game) {

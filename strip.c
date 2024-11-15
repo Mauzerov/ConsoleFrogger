@@ -90,12 +90,10 @@ int add_entity_at(
     struct Game * game,
     int position
 ) {
-    static UID uid = 0; 
     (void)game;
     (void)bg;
 
     entity->position = position != -1 ? position : rand() % game->size.x;
-    entity->uid = ++uid;
 
     if (self->entities == NULL){
         self->entities = malloc(sizeof(Entity));
@@ -159,7 +157,7 @@ Strip * create_strip_river(struct Game * game) {
         game->config.LOGS_PER_STRIP,
         game
     );
-    self->collide = entity_oncollide_death;
+    self->collide = lose_game;
     return self;
 }
 
@@ -175,8 +173,8 @@ Strip * create_strip_river(struct Game * game) {
 
 Strip * create_strip_road(struct Game * game) {
     Entity fg[] = {
-        { Car,  .width = 1, .on_collide = entity_oncollide_death },
-        { Car,  .width = 1, .on_collide = entity_oncollide_death },
+        { Car,  .width = 1, .type = Evil },
+        { Car,  .width = 1, .type = Evil },
         { Taxi, .width = 1 }
     };
     return _create_strip_movable(
@@ -198,7 +196,7 @@ Strip * create_strip_road(struct Game * game) {
 
 Strip * create_strip_forest(struct Game * game) {
     Entity fg[] = {
-        { Tree, .width = 1, .on_collide = entity_oncollide_tree },
+        { Tree, .width = 1, .type = Solid },
     };
     Strip * self = _create_strip_common(game);
 

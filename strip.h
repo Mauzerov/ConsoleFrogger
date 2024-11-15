@@ -14,14 +14,12 @@
 
 struct Game;
 
-typedef int(* CollideFunction)(struct Entity*, struct Game *);
-
 struct Strip {
     struct Entity * entities; // Linked List
     Symbol bg;                // Strip can only have one backgroud (more is unnecessary)
-    void (*update)   (struct Strip * self, struct Game * game);
-    void (*render)   (struct Strip * self, struct Game * game);
-     CollideFunction collide;
+    void (*update)   (struct Strip *, struct Game *);
+    void (*render)   (struct Strip *, struct Game *);
+    void (*collide)  (struct Game *);
     // Movable Strip definition
     int direction;
     int state, velocity;
