@@ -15,15 +15,18 @@ void write_leaderboard(FILE * file, Player leaderboard[LEADERBOARD_SIZE]) {
     for (int i = 0; i < LEADERBOARD_SIZE; i++) {
         if (strlen(leaderboard[i].name) == 0)
             break;
-        fprintf(file, "%s %lu\n", leaderboard[i].name, leaderboard[i].score);
+        fprintf(file, "%lu %s\n",
+            leaderboard[i].score,
+            leaderboard[i].name
+        );
     }
 }
 
 int read_leaderboard(FILE * file, Player leaderboard[LEADERBOARD_SIZE]) {
     int player_count = 0;
-    while (fscanf(file, "%19s %lu",
-        leaderboard [player_count].name,
-        &leaderboard[player_count].score
+    while (fscanf(file, "%lu %19[^\n]",
+        &leaderboard[player_count].score,
+        leaderboard [player_count].name
     ) == 2) player_count++;
 
     if (player_count > 1)
@@ -73,12 +76,12 @@ void read_player_name(struct Game * game) {
     int posx = off.x + (game->size.x / 2) - 12;
     char name[20] = { 0 };
 
-    mvaddstr(posy++, posx, "                            ");
-    mvaddstr(posy++, posx, " +======+  Winner  +======+ ");
-    mvaddstr(posy++, posx, " |Name:                   | ");
-    mvaddstr(posy++, posx, " +========================+ ");
-    mvaddstr(posy++, posx, "                            ");
-    mvscanw (posy-3, posx + 7, "%19s", name);
+    mvaddstr (posy++, posx, "                            ");
+    mvaddstr (posy++, posx, " +======+  Winner  +======+ ");
+    mvaddstr (posy++, posx, " |Name:                   | ");
+    mvaddstr (posy++, posx, " +========================+ ");
+    mvaddstr (posy++, posx, "                            ");
+    mvgetnstr(posy-3, posx + 7, name, 19);
 
     FILE * file = fopen(LEADERBOARD_FILENAME, "a+");
     if (file != NULL && strlen(name) > 0) {

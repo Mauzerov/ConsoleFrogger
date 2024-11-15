@@ -171,14 +171,14 @@ void update_game(struct Game * game) {
         end_game(game, WIN);
         return; // if player won no need to check collisions
     }
-    // non game over
+    
     if (resolve_player_collisions(playerStrip, game) == 0u)
         invoke(playerStrip->collide, game);
 
     for (int i = 0; i < game->size.y; i++) {
         invoke(game->strips[i]->update, game->strips[i], game);
     }
-    // game over 
+    // second call required, so that the fail screen isn't awkward
     if (resolve_player_collisions(playerStrip, game) == 0u)
         invoke(playerStrip->collide, game);
 }
