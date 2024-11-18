@@ -11,7 +11,10 @@ int order_players(const void * a, const void * b) {
     return ((Player *)a)->score - ((Player *)b)->score;
 }
 
-void write_leaderboard(FILE * file, Player leaderboard[LEADERBOARD_SIZE]) {
+void write_leaderboard(Player leaderboard[LEADERBOARD_SIZE]) {
+    FILE * file = fopen(LEADERBOARD_FILENAME, "w");
+    if (file == NULL)
+        return;
     for (int i = 0; i < LEADERBOARD_SIZE; i++) {
         if (strlen(leaderboard[i].name) == 0)
             break;
@@ -20,14 +23,21 @@ void write_leaderboard(FILE * file, Player leaderboard[LEADERBOARD_SIZE]) {
             leaderboard[i].name
         );
     }
+    fclose(file);
 }
 
-int read_leaderboard(FILE * file, Player leaderboard[LEADERBOARD_SIZE]) {
+int read_leaderboard(Player leaderboard[LEADERBOARD_SIZE]) {
+    FILE * file = fopen(LEADERBOARD_FILENAME, "r");
+
+    if (file == NULL)
+        return 0;
+
     int player_count = 0;
     while (fscanf(file, "%lu %19[^\n]",
         &leaderboard[player_count].score,
         leaderboard [player_count].name
     ) == 2) player_count++;
+    fclose(file);
 
     if (player_count > 1)
         qsort(leaderboard, player_count, sizeof(Player), order_players);
@@ -35,12 +45,12 @@ int read_leaderboard(FILE * file, Player leaderboard[LEADERBOARD_SIZE]) {
 }
 
 void add_player_to_leaderboard(
-    FILE * file,
     const char * name,
     unsigned long score
 ) {
+    // TODO: to allow continuous play change this to game->leaderboard
     Player leaderboard[LEADERBOARD_SIZE] = { 0 };
-    int i, player_count = read_leaderboard(file, leaderboard);
+    int i, player_count = read_leaderboard(leaderboard);
 
     // assume players are sorted from lowest to highest point
     for (i = 0; i < player_count; i++) {
@@ -60,33 +70,28 @@ void add_player_to_leaderboard(
     strcpy(leaderboard[i].name, name);
     leaderboard[i].score = score;
 
-    write_leaderboard(
-        freopen(NULL, "w", file),
-        leaderboard
-    );
+    write_leaderboard(leaderboard);
 }
 
 void read_player_name(struct Game * game) {
+    WINDOW * w = game->window;
     echo();
     curs_set(1);
-    timeout(-1);
-    struct Point off = get_offset(game);
+    wtimeout(w, -1);
 
-    int posy = off.y + (game->size.y / 2) - 2;
-    int posx = off.x + (game->size.x / 2) - 12;
+    int posy = (game->size.y / 2) - 2;
+    int posx = (game->size.x / 2) - (INFO_PANEL_WIDTH / 2);
     char name[20] = { 0 };
 
-    mvaddstr (posy++, posx, "                            ");
-    mvaddstr (posy++, posx, " +======+  Winner  +======+ ");
-    mvaddstr (posy++, posx, " |Name:                   | ");
-    mvaddstr (posy++, posx, " +========================+ ");
-    mvaddstr (posy++, posx, "                            ");
-    mvgetnstr(posy-3, posx + 7, name, 19);
+    mvwaddstr (w, posy++, posx, "                            ");
+    mvwaddstr (w, posy++, posx, " +======+  Winner  +======+ ");
+    mvwaddstr (w, posy++, posx, " |Name:                   | ");
+    mvwaddstr (w, posy++, posx, " +========================+ ");
+    mvwaddstr (w, posy++, posx, "                            ");
+    mvwgetnstr(w, posy-3, posx + 7, name, 19);
 
-    FILE * file = fopen(LEADERBOARD_FILENAME, "a+");
-    if (file != NULL && strlen(name) > 0) {
-        add_player_to_leaderboard(file, name, game->score);
-        fclose(file);
+    if (strlen(name) > 0) {
+        add_player_to_leaderboard(name, game->score);
     }
 }
 
@@ -110,9 +115,10 @@ void handle_key_down(struct Game * game, int keycode) {
     }
 }
 
-void init_curses(const struct Config * config) {
-    initscr();
-    timeout(config->TIMEOUT);
+WINDOW * init_curses(const struct Config * config) {
+    WINDOW * window = initscr();
+    wtimeout(window, config->TIMEOUT);
+    fprintf(stderr, "Colors: %d\n", has_colors());
     start_color();
 
     init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
@@ -126,6 +132,58 @@ void init_curses(const struct Config * config) {
 
     curs_set(0);
     noecho();
+    return window;
+}
+
+void init_sub_windows(struct Game * game, WINDOW * main_window) {
+    int offx, offy;
+    getmaxyx(stdscr, offy, offx);
+
+    struct Point off = (struct Point) {
+        .x = (offx - (game->size.x + 2 + INFO_PANEL_WIDTH )) / 2,
+        .y = (offy - (game->config.VISIBLE_STRIPS + 2)) / 2,
+    };
+
+    WINDOW * game_border = subwin(
+        main_window,
+        game->config.VISIBLE_STRIPS + 2,
+        game->size.x + 2,
+        off.y - 1, off.x - 1
+    );
+    game->window = derwin(
+        game_border,
+        game->config.VISIBLE_STRIPS,
+        game->size.x,
+        1, 1
+    );
+    fprintf(stderr, "%d %d\n", off.x, off.y);
+    game->info_panel = derwin(
+        main_window,
+        INFO_PANEL_HEIGHT, INFO_PANEL_WIDTH,
+        (offy - (INFO_PANEL_HEIGHT)) / 2, off.x + game->size.x + 2
+    );
+
+    box(game_border, '#', '#');
+    box(game->info_panel, '#', '#');
+    wrefresh(game_border);
+    wrefresh(game->info_panel);
+}
+
+void main_loop(struct Game * game) {
+    int key = ERR;
+    do {
+        render_game(game);
+        render_game_state (game);
+        render_leaderboard(game);
+        wrefresh(game->info_panel);
+        key = wgetch(game->window);
+        wrefresh(game->window);
+        handle_key_down(game, key);
+
+        update_game(game);
+    } while (!game->over);
+
+    render_game(game);
 }
 
 int main() {
@@ -133,21 +191,16 @@ int main() {
     srand(rand());
     srand(rand());
     struct Game game = { 0 };
-
     init_game(&game);
-    init_curses(&game.config);
-    int key = ERR;
 
-    do {
-        render_game(&game);
-        key = getch();
-        refresh();
-        handle_key_down(&game, key);
+    WINDOW * main_window = init_curses(&game.config);
 
-        update_game(&game);
-    } while (!game.over);
+    init_sub_windows(&game, main_window);
 
-    render_game(&game);
+    main_loop(&game);
+
+
+    fprintf(stderr, "Game Ended with %d\n", game.over);
     if (game.over == WIN) {
         read_player_name(&game);
     }

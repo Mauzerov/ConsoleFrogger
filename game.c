@@ -3,28 +3,29 @@
 #include "strip.h"
 #include "game.h"
 
-extern int read_leaderboard(FILE *, Player[LEADERBOARD_SIZE]);
+extern int read_leaderboard(Player[LEADERBOARD_SIZE]);
 
-void render_leaderboard(struct Game * game, struct Point off) {
-    (void)off; (void)game;
-    FILE * file = fopen(LEADERBOARD_FILENAME, "r");
+void render_leaderboard(struct Game * game) {
+    WINDOW * window = game->info_panel;
+    Player * leaderboard = game->leaderboard;
 
-    if (file == NULL)
-        return;
-
-    Player leaderboard[LEADERBOARD_SIZE] = { 0 };
-    int player_count = read_leaderboard(file, leaderboard);
-
-    int posy = off.y + game->size.y + 2;
-    mvaddstr(posy - 1, off.x + game->size.x / 2 - 5, "LEADERBOARD");
+    mvwaddstr(window, 2, (INFO_PANEL_WIDTH - 12) >> 1, "LEADERBOARD:");
     
-    char leaderboard_line[40] = { 0 };
-    for (int i = 0; i < player_count; i++) {
-        int lenght = sprintf(leaderboard_line, "%d. %-20s: %05lu", i + 1,
-            leaderboard[i].name, leaderboard[i].score);
-        int posx = off.x + ((game->size.x - lenght) >> 1);
-        mvaddstr(posy + i, posx, leaderboard_line);
+    char leaderboard_line[INFO_PANEL_WIDTH * 2] = { 0 };
+    for (int i = 0; i < game->player_count; i++) {
+        sprintf(leaderboard_line, " %1d: %-20s", i + 1, leaderboard[i].name);
+        mvwaddstr(window, 3 + i * 2,     1, leaderboard_line);
+
+        sprintf(leaderboard_line, "  : %05lu", leaderboard[i].score);
+        mvwaddstr(window, 3 + i * 2 + 1, 1, leaderboard_line);
     }
+}
+
+void render_game_state(struct Game * game) {
+    WINDOW * window = game->info_panel;
+    char buffer[100] = { 0 };
+    int lenght = sprintf(buffer, " Score: %05lu ", game->score);
+    mvwaddstr(window, 0, ((INFO_PANEL_WIDTH - lenght) >> 1), buffer);
 }
 
 #define ConfigRead(config, field)          \
@@ -38,8 +39,8 @@ void read_config_file(struct Game * game) {
     if (file == NULL)
         return;
 
-    char buffer[20] = { 0 };
-    while (fscanf(file, "%s", buffer) == 1) {
+    char buffer[41] = { 0 };
+    while (fscanf(file, "%40s", buffer) == 1) {
         if (strcmp(buffer, "BOARD_SIZE") == 0) {
             fscanf(file, "%d %d", &game->size.x, &game->size.y);
         }
@@ -51,6 +52,8 @@ void read_config_file(struct Game * game) {
         ConfigRead(game->config, TREES_PER_STRIP);
         ConfigRead(game->config, CHANCE_OF_SLOW_STRIP);
         ConfigRead(game->config, TIMEOUT);
+        ConfigRead(game->config, VISIBLE_STRIPS);
+        ConfigRead(game->config, VISIBLE_AHEAD);
     }
     fclose(file);
 }
@@ -84,15 +87,24 @@ void init_strips(struct Game * game) {
             strip->direction *= -1;
         }
         prev_direction = strip->direction;
+        // Todo: check is there exists at least one path between trees
         game->strips[i] = strip;
     }
 }
 
 void init_game(struct Game * game) {
-    game->size.x = GAME_WIDTH;
-    game->size.y = GAME_HEIGHT;
-
     read_config_file(game);
+
+    game->player_count = read_leaderboard(game->leaderboard);
+
+    if (game->size.x == 0 || game->size.x > MAX_GAME_WIDTH) {
+        // Todo: add error message
+        game->size.x = MAX_GAME_WIDTH;
+    }
+    if (game->size.y == 0 || game->size.y > MAX_GAME_HEIGHT) {
+        game->size.y = MAX_GAME_HEIGHT;
+    }
+
     game->player.y = game->size.y - 1;
 
     game->strips = malloc(game->size.y * sizeof(struct Strip *));
@@ -105,48 +117,46 @@ struct Point get_offset(struct Game * game) {
     getmaxyx(stdscr, offy, offx);
 
     return (struct Point) {
-        .x = (offx - game->size.x) / 2,
-        .y = (offy - game->size.y) / 2 - 2,
+        .x = (offx - (game->size.x + 2)) / 2,
+        .y = (offy - (game->size.y + 2)) / 2 - 2,
     };
 }
 
-void render_game_state(struct Game * game, struct Point off) {
-    char buffer[100] = { 0 };
-    int lenght = sprintf(buffer, "Score: %05lu", game->score);
-    mvaddstr(off.y - 2, off.x + ((game->size.x - lenght) >> 1), buffer);
-}
-
-void render_border(struct Game * game, struct Point off) {
+void render_border(WINDOW * window, struct Game * game) {
     int height = game->size.y + 1;
     int width  = game->size.x + 1;
 
     for (int y = 0; y <= height; y++) {
         for (int x = 0; x <= width; x++) {
             if (!!(x % width) ^ !!(y % height)) {
-                game->cursor.x = off.x - 1 + x;
-                game->cursor.y = off.y - 1 + y;
-                render_symbol(Border, game);
+                game->cursor.x = 1 + x;
+                game->cursor.y = 1 + y;
+                render_symbol(window, Border, game);
             }
         }
     }
 }
 
 void render_game(struct Game * game) {
-    struct Point off = get_offset(game);
-    render_border(game, off);
-    render_game_state(game, off);
-    render_leaderboard(game, off);
+    WINDOW * window = game->window;
 
-    game->cursor.y = off.y;
-    for (int i = 0; i < game->size.y; i++) {
-        game->cursor.x = off.x;
-        invoke(game->strips[i]->render, game->strips[i], game);
-        game->cursor.y++;
+    int visibility = game->config.VISIBLE_STRIPS;
+    int scroll = clamp(
+        0, game->player.y - game->config.VISIBLE_AHEAD, game->size.y - visibility
+    );
+
+    for (int i = 0; i < visibility; i++) {
+        game->cursor.y = i;
+        game->cursor.x = 0;
+        invoke(
+            game->strips[i + scroll]->render,
+            window, game->strips[i + scroll], game
+        );
     }
 
-    game->cursor.x = game->player.x + off.x;
-    game->cursor.y = game->player.y + off.y;
-    render_symbol(Frog, game);
+    game->cursor.x = game->player.x;
+    game->cursor.y = game->player.y - scroll;
+    render_symbol(window, Frog, game);
     attron(COLOR_PAIR(Null));
 }
 

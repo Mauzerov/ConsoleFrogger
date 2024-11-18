@@ -1,7 +1,7 @@
 #ifndef CELL_H
 #define CELL_H
 
-typedef unsigned long long UID;
+#include "engine.h"
 
 typedef enum {
     Border = 0,
@@ -31,7 +31,6 @@ struct Cell {
 
 typedef struct Cell Cell;
 
-void render_symbol(Symbol, struct Game *);
-
+void render_symbol(WINDOW *, Symbol, struct Game *);
 
 #endif

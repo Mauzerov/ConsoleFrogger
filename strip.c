@@ -7,23 +7,23 @@
 #include "game.h"
 #include "entity.h"
 
-void render_symbol(Symbol symbol, struct Game * game) {
+void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
     static char symbols[]  = "# @&~=_OT";
-    attron(COLOR_PAIR(symbol));
-    mvaddch(game->cursor.y, game->cursor.x, symbols[symbol]);
+    wattron(window, COLOR_PAIR(symbol));
+    mvwaddch(window, game->cursor.y, game->cursor.x, symbols[symbol]);
 }
 
-void render_strip(Strip * self, struct Game * game) {
+void render_strip(WINDOW * window, Strip * self, struct Game * game) {
     int cursor_x = game->cursor.x;
     for (int i = 0; i < game->size.x; i++) {
-        render_symbol(self->bg, game);
+        render_symbol(window, self->bg, game);
         game->cursor.x++;
     }
     struct Entity * head = self->entities;
     while (head != NULL) {
         for (unsigned i = 0; i < head->width; i++) {
             game->cursor.x = cursor_x + (head->position + i) % game->size.x;
-            render_symbol(head->symbol, game);
+            render_symbol(window, head->symbol, game);
         }
         head = head->next;
     }
@@ -219,8 +219,6 @@ void destroy_linked_list(struct Entity * entity) {
 
 void destroy_strip(Strip * self) {
     destroy_linked_list(self->entities);
-    // if (self->items != NULL)
-    //     free(self->items);
     free(self);
 }
 

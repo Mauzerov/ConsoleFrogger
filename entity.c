@@ -10,9 +10,6 @@ void undo_move(struct Game * game) {
     game->player.y -= game->prev_move.y;
     // clear prev move
     memset(&game->prev_move, 0, sizeof(struct Point));
-    // if player move up/down on a moving strip they can hit a tree
-    //    then they remain on the moving item
-    // handle_entity_collision(game, entity_oncollide_death);
 }
 
 void lose_game(struct Game * game) {

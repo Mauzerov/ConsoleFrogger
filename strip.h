@@ -8,6 +8,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "engine.h"
 #include "cell.h"
 #include "game.h"
 #include "entity.h"
@@ -18,7 +19,7 @@ struct Strip {
     struct Entity * entities; // Linked List
     Symbol bg;                // Strip can only have one backgroud (more is unnecessary)
     void (*update)   (struct Strip *, struct Game *);
-    void (*render)   (struct Strip *, struct Game *);
+    void (*render)   (WINDOW *, struct Strip *, struct Game *);
     void (*collide)  (struct Game *);
     // Movable Strip definition
     int direction;
@@ -30,8 +31,8 @@ typedef struct Strip Strip;
 typedef struct Entity Entity;
 
 
-void render_strip(Strip *, struct Game *);
-void render_cell(Symbol, struct Game *);
+void render_strip(WINDOW *, Strip *, struct Game *);
+// void render_cell(Symbol, struct Game *);
 
 Strip * _create_strip_common();
 
