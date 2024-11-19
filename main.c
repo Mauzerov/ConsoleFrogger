@@ -163,6 +163,7 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
 
     cbreak();
     nodelay(game->window, TRUE);
+    keypad(game->window, TRUE);
 
     box(game_border, '#', '#');
     box(game->info_panel, '#', '#');
@@ -190,7 +191,7 @@ void calculate_time_difference(
 void main_loop(struct Game * game) {
     // Todo: implement 100% cpu usage loop using `clock_gettime`
     //       check if enough time has passed for an update to happen
-    //       possibly sleep for like 2ms so the cpu isn't abused (2ms might in thery be worse)
+    //       possibly sleep for like 2ms so the cpu isn't abused (2ms might in theory be worse)
     //       store time_update in entity, pass `dt` to update (?)
     //                not sure how to handle passed time if entities have different values
     //                possibly store the passed time inside the entity aswell?
@@ -198,7 +199,8 @@ void main_loop(struct Game * game) {
     int key = ERR;
     struct timespec start, end;
     clock_gettime(CLOCK_REALTIME, &start);
-
+    render_game(game);
+    render_leaderboard(game);
     do {
         clock_gettime(CLOCK_REALTIME, &end);
         calculate_time_difference(&end, &start);
@@ -207,11 +209,10 @@ void main_loop(struct Game * game) {
         if (_key != ERR)
             key = _key;
 
-        if (end.tv_nsec > 300000000) {
+        if (end.tv_nsec > 200000000) {
             render_game(game);
             render_game_state (game);
-            render_leaderboard(game);
-
+            
             wrefresh(game->info_panel);
             wrefresh(game->window);
             handle_key_down(game, key);
