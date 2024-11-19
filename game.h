@@ -75,15 +75,4 @@ void update_game(struct Game *);
 
 void destroy_game(struct Game *);
 
-#define max(a, b) (((a) < (b)) ? (b) : (a))
-
-#define min(a, b) (((a) < (b)) ? (a) : (b))
-
-#define clamp(x_min, x, x_max) ( \
-    ((x) < (x_min)) ?            \
-        (x_min)     :            \
-        (((x) > (x_max)) ?       \
-            (x_max)      : (x))  \
-)
-
 #endif
