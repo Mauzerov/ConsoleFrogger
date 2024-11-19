@@ -116,8 +116,9 @@ void handle_key_down(struct Game * game, int keycode) {
 }
 
 WINDOW * init_curses(const struct Config * config) {
+    (void)config;
     WINDOW * window = initscr();
-    wtimeout(window, config->TIMEOUT);
+    // wtimeout(window, 0);
     fprintf(stderr, "Colors: %d\n", has_colors());
     start_color();
 
@@ -146,15 +147,12 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
 
     WINDOW * game_border = subwin(
         main_window,
-        game->config.VISIBLE_STRIPS + 2,
-        game->size.x + 2,
+        game->config.VISIBLE_STRIPS + 2, game->size.x + 2,
         off.y - 1, off.x - 1
     );
     game->window = derwin(
         game_border,
-        game->config.VISIBLE_STRIPS,
-        game->size.x,
-        1, 1
+        game->config.VISIBLE_STRIPS, game->size.x, 1, 1
     );
     fprintf(stderr, "%d %d\n", off.x, off.y);
     game->info_panel = derwin(
@@ -163,24 +161,64 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
         (offy - (INFO_PANEL_HEIGHT)) / 2, off.x + game->size.x + 2
     );
 
+    cbreak();
+    nodelay(game->window, TRUE);
+
     box(game_border, '#', '#');
     box(game->info_panel, '#', '#');
     wrefresh(game_border);
     wrefresh(game->info_panel);
 }
 
-void main_loop(struct Game * game) {
-    int key = ERR;
-    do {
-        render_game(game);
-        render_game_state (game);
-        render_leaderboard(game);
-        wrefresh(game->info_panel);
-        key = wgetch(game->window);
-        wrefresh(game->window);
-        handle_key_down(game, key);
 
-        update_game(game);
+void calculate_time_difference(
+    struct timespec *end,
+    const struct timespec *start
+) {
+    // Calculate difference in seconds
+    end->tv_sec -= start->tv_sec;
+    
+    // Calculate difference in nanoseconds
+    if (end->tv_nsec < start->tv_nsec) {
+        end->tv_sec -= 1; // Borrow 1 second
+        end->tv_nsec = 1000000000 + end->tv_nsec - start->tv_nsec;
+    } else {
+        end->tv_nsec -= start->tv_nsec;
+    }
+}
+
+void main_loop(struct Game * game) {
+    // Todo: implement 100% cpu usage loop using `clock_gettime`
+    //       check if enough time has passed for an update to happen
+    //       possibly sleep for like 2ms so the cpu isn't abused (2ms might in thery be worse)
+    //       store time_update in entity, pass `dt` to update (?)
+    //                not sure how to handle passed time if entities have different values
+    //                possibly store the passed time inside the entity aswell?
+    //       :Essaying:
+    int key = ERR;
+    struct timespec start, end;
+    clock_gettime(CLOCK_REALTIME, &start);
+
+    do {
+        clock_gettime(CLOCK_REALTIME, &end);
+        calculate_time_difference(&end, &start);
+
+        int _key = wgetch(game->window);
+        if (_key != ERR)
+            key = _key;
+
+        if (end.tv_nsec > 300000000) {
+            render_game(game);
+            render_game_state (game);
+            render_leaderboard(game);
+
+            wrefresh(game->info_panel);
+            wrefresh(game->window);
+            handle_key_down(game, key);
+            update_game(game);
+            clock_gettime(CLOCK_REALTIME, &start);
+            key = ERR;
+        }
     } while (!game->over);
 
     render_game(game);
