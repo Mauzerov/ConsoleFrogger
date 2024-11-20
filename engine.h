@@ -11,4 +11,15 @@
     if (func != NULL) func(__VA_ARGS__);  \
 } while (0)
 
+#define max(a, b) (((a) < (b)) ? (b) : (a))
+
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+
+#define clamp(x_min, x, x_max) ( \
+    ((x) < (x_min)) ?            \
+        (x_min)     :            \
+        (((x) > (x_max)) ?       \
+            (x_max)      : (x))  \
+)
+
 #endif
