@@ -4,13 +4,15 @@
 // NOTE: Entity should overload most (if not all) of Cell
 struct Entity {
     Symbol symbol;
-    // TODO: remove uid (if needed use pointer adresses, should be unique enough)
     CellType type;
     // Entity width (number of positions taken up, to the right of .position)
     unsigned width;
+    void (*player_near)(struct Entity *);
     // just a x-axis position (y is obtained from strip)
     // no need for duplication of data
     unsigned position;
+    
+    int state, velocity;
     // NOTE: Entity is a linked list:
     // Why? - easiest implementation for removing and adding new entities
     //      + entities do not interact with eachother
@@ -29,5 +31,7 @@ void lose_game(struct Game *);
 void end_game(struct Game *, int);
 
 void handle_entity_collision(struct Entity *, struct Game*);
+
+void player_near_car(struct Entity *);
 
 #endif

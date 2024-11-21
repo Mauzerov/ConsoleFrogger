@@ -3,6 +3,12 @@
 #include "strip.h"
 #include "game.h"
 
+unsigned _P(int point, struct Game * game) {
+    while (point < 0)
+        point += game->size.x;
+    return point % game->size.x;
+}
+
 extern int read_leaderboard(Player[LEADERBOARD_SIZE]);
 
 void render_leaderboard(struct Game * game) {

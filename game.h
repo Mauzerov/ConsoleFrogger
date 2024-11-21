@@ -7,6 +7,9 @@
 #define INFO_PANEL_WIDTH  28
 #define INFO_PANEL_HEIGHT 15
 
+#define CELL_WIDTH 3
+#define CELL_HEIGHT 2
+
 #define WIN 2
 #define LOSS 1
 
@@ -70,6 +73,8 @@ void render_border(WINDOW *, struct Game *);
 void render_game(struct Game *);
 
 unsigned resolve_player_collisions(struct Strip *, struct Game *);
+
+unsigned _P(int, struct Game *);
 
 void update_game(struct Game *);
 

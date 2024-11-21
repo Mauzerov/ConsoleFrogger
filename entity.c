@@ -35,3 +35,7 @@ void handle_entity_collision(
         break;
     }
 }
+
+void player_near_car(struct Entity * self) {
+    self->state = 0;
+}

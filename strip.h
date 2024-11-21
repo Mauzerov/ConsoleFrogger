@@ -44,6 +44,8 @@ int add_entity_at(Strip *, Entity *, Symbol, struct Game *, int);
 
 int add_entity(Strip *, Entity *, Symbol, struct Game *);
 
+int get_strip_index(Strip *, Strip **);
+
 Strip * _create_strip_movable(Symbol, Entity *, size_t, size_t, struct Game *);
 
 Strip * create_strip_river(struct Game *);
