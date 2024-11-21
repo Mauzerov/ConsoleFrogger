@@ -40,6 +40,22 @@ void render_game_state(struct Game * game) {
     }
 #define CONFIG_FILE_NAME "frogger.config"
 
+void read_textures(struct Game * game, FILE * file) {
+    const int size = CELL_WIDTH * CELL_HEIGHT;
+    char c;
+    for (int i = 0; i < size; i++) {
+        game->textures[0][i] = '#';
+    }
+    for (int i = 1; i < Symbol_Count; i++) {
+        int lenght = 0;
+        while (lenght < size) {
+            fscanf(file, "%c", &c);
+            if (c == '\n') continue;
+            game->textures[i][lenght++] = c;
+        }
+    }
+}
+
 void read_config_file(struct Game * game) {
     FILE * file = fopen(CONFIG_FILE_NAME, "r");
     if (file == NULL)
@@ -52,6 +68,9 @@ void read_config_file(struct Game * game) {
         }
         if (strcmp(buffer, "PLAYER_X") == 0) {
             fscanf(file, "%d", &game->player.x);
+        }
+        if (strcmp(buffer, "TEXTURES") == 0) {
+            read_textures(game, file);
         }
         ConfigRead(game->config, CARS_PER_STRIP);
         ConfigRead(game->config, LOGS_PER_STRIP);

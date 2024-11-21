@@ -8,18 +8,6 @@
 #include "entity.h"
 
 void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
-    static char textures[Symbol_Count][CELL_WIDTH * CELL_HEIGHT] = {
-        "######",
-        "      ",
-        "7_P@^@",
-        "J&L 8 ",
-        "~~--~-",
-        "/====/",
-        "   ___",
-        "JDLo^o",
-        "T#Xo^o",
-    };
-
     wattron(window, COLOR_PAIR(symbol));
     for (int i = 0; i < CELL_HEIGHT; i++) {
         for (int j = 0; j < CELL_WIDTH; j++) {
@@ -27,7 +15,7 @@ void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
                 window,
                 game->cursor.y * CELL_HEIGHT + i,
                 game->cursor.x * CELL_WIDTH + j,
-                textures[symbol][i * CELL_WIDTH + j]
+                game->textures[symbol][i * CELL_WIDTH + j]
             );
         }
     }

@@ -54,11 +54,12 @@ struct Game {
     int player_count;
     int over;
     unsigned long score;
+    char textures[Symbol_Count][CELL_WIDTH * CELL_HEIGHT];
 };
 
 int moveby(void *, int, int);
 
-// struct Point get_offset(struct Game *);
+void read_textures(struct Game *, FILE *);
 
 void read_config_file(struct Game *);
 
