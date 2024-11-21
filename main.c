@@ -147,12 +147,15 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
 
     WINDOW * game_border = subwin(
         main_window,
-        game->config.VISIBLE_STRIPS + 2, game->size.x + 2,
+        game->config.VISIBLE_STRIPS * CELL_HEIGHT + 2,
+        game->size.x + 2,
         off.y - 1, off.x - 1
     );
     game->window = derwin(
         game_border,
-        game->config.VISIBLE_STRIPS, game->size.x, 1, 1
+        game->config.VISIBLE_STRIPS * CELL_HEIGHT,
+        game->size.x,
+        1, 1
     );
     fprintf(stderr, "%d %d\n", off.x, off.y);
     game->info_panel = derwin(
