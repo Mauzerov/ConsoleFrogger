@@ -39,14 +39,10 @@ void render_game_state(struct Game * game) {
     if (strcmp(#field, buffer) == 0) {     \
         fscanf(file, "%d", &config.field); \
     }
-#define CONFIG_FILE_NAME "frogger.config"
 
 void read_textures(struct Game * game, FILE * file) {
     const int size = CELL_WIDTH * CELL_HEIGHT;
     char c;
-    for (int i = 0; i < size; i++) {
-        game->textures[0][i] = '#';
-    }
     for (int i = 1; i < Symbol_Count; i++) {
         int lenght = 0;
         while (lenght < size) {

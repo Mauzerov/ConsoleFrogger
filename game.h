@@ -16,6 +16,8 @@
 #define INFO_PANEL_WIDTH  38
 #define INFO_PANEL_HEIGHT (LEADERBOARD_SIZE + 2)
 
+#define CONFIG_FILE_NAME "frogger.config"
+
 #include "engine.h"
 #include "strip.h"
 #include "entity.h"

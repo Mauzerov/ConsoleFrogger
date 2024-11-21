@@ -77,12 +77,14 @@ void read_player_name(struct Game * game) {
     WINDOW * w = game->window;
     echo();
     curs_set(1);
-    wtimeout(w, -1);
 
-    int posy = (game->size.y / 2) - 2;
-    int posx = (game->size.x / 2) - (INFO_PANEL_WIDTH / 2);
+    keypad(w,  FALSE);
+    nodelay(w, FALSE);
+
+    int posy = (game->config.VISIBLE_STRIPS * CELL_HEIGHT - 5) / 2;
+    int posx = (game->size.x * CELL_WIDTH - 28) / 2;
     char name[20] = { 0 };
-
+    wattron(w, COLOR_PAIR(Null));
     mvwaddstr (w, posy++, posx, "                            ");
     mvwaddstr (w, posy++, posx, " +======+  Winner  +======+ ");
     mvwaddstr (w, posy++, posx, " |Name:                   | ");
@@ -161,9 +163,9 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
         (offx - INFO_PANEL_WIDTH) / 2
     );
 
-    cbreak();
+    // cbreak();
     nodelay(game->window, TRUE);
-    keypad(game->window, TRUE);
+    keypad(game->window,  TRUE);
 
     box(game_border, '#', '#');
     box(game->info_panel, '#', '#');
@@ -223,6 +225,7 @@ void main_loop(struct Game * game) {
     } while (!game->over);
 
     render_game(game);
+    render_game_state (game);
 }
 
 int main() {
@@ -237,7 +240,6 @@ int main() {
     init_sub_windows(&game, main_window);
 
     main_loop(&game);
-
 
     fprintf(stderr, "Game Ended with %d\n", game.over);
     if (game.over == WIN) {

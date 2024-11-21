@@ -9,6 +9,7 @@
 
 void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
     wattron(window, COLOR_PAIR(symbol));
+    assert(symbol > 0);
     for (int i = 0; i < CELL_HEIGHT; i++) {
         for (int j = 0; j < CELL_WIDTH; j++) {
             mvwaddch(
