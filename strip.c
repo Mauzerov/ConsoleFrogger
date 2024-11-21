@@ -8,8 +8,7 @@
 #include "entity.h"
 
 void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
-    static char textures
-        [Symbol_Count][CELL_WIDTH * CELL_HEIGHT] = {
+    static char textures[Symbol_Count][CELL_WIDTH * CELL_HEIGHT] = {
         "######",
         "      ",
         "7_P@^@",
