@@ -37,7 +37,7 @@ void render_game_state(struct Game * game) {
 
 #define ConfigRead(config, field)          \
     if (strcmp(#field, buffer) == 0) {     \
-        fscanf(file, "%d", &config.field); \
+        fscanf(file, "%d", &config->field); \
     }
 
 void read_textures(struct Game * game, FILE * file) {
@@ -53,6 +53,16 @@ void read_textures(struct Game * game, FILE * file) {
     }
 }
 
+void read_game_config(FILE * file, struct Config * config, char * buffer) {
+    ConfigRead(config, CARS_PER_STRIP);
+    ConfigRead(config, LOGS_PER_STRIP);
+    ConfigRead(config, TREES_PER_STRIP);
+    ConfigRead(config, CHANCE_OF_SLOW_STRIP);
+    ConfigRead(config, TIMEOUT);
+    ConfigRead(config, VISIBLE_STRIPS);
+    ConfigRead(config, VISIBLE_AHEAD);
+}
+
 void read_config_file(struct Game * game) {
     FILE * file = fopen(CONFIG_FILE_NAME, "r");
     if (file == NULL)
@@ -62,20 +72,16 @@ void read_config_file(struct Game * game) {
     while (fscanf(file, "%40s", buffer) == 1) {
         if (strcmp(buffer, "BOARD_SIZE") == 0) {
             fscanf(file, "%d %d", &game->size.x, &game->size.y);
-        }
+        } else
         if (strcmp(buffer, "PLAYER_X") == 0) {
             fscanf(file, "%d", &game->player.x);
-        }
+            if (game->player.x < 0)
+                game->player.x = rand() % game->size.x;
+        } else
         if (strcmp(buffer, "TEXTURES") == 0) {
             read_textures(game, file);
-        }
-        ConfigRead(game->config, CARS_PER_STRIP);
-        ConfigRead(game->config, LOGS_PER_STRIP);
-        ConfigRead(game->config, TREES_PER_STRIP);
-        ConfigRead(game->config, CHANCE_OF_SLOW_STRIP);
-        ConfigRead(game->config, TIMEOUT);
-        ConfigRead(game->config, VISIBLE_STRIPS);
-        ConfigRead(game->config, VISIBLE_AHEAD);
+        } else
+        read_game_config(file, &game->config, buffer);
     }
     fclose(file);
 }
