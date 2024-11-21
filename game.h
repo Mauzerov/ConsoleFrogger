@@ -4,9 +4,6 @@
 #define MAX_GAME_WIDTH  45
 #define MAX_GAME_HEIGHT 100
 
-#define INFO_PANEL_WIDTH  28
-#define INFO_PANEL_HEIGHT 15
-
 #define CELL_WIDTH 3
 #define CELL_HEIGHT 2
 
@@ -15,6 +12,9 @@
 
 #define LEADERBOARD_FILENAME "frogger.score"
 #define LEADERBOARD_SIZE 5
+
+#define INFO_PANEL_WIDTH  38
+#define INFO_PANEL_HEIGHT (LEADERBOARD_SIZE + 2)
 
 #include "engine.h"
 #include "strip.h"

@@ -139,29 +139,26 @@ WINDOW * init_curses(const struct Config * config) {
 void init_sub_windows(struct Game * game, WINDOW * main_window) {
     int offx, offy;
     getmaxyx(stdscr, offy, offx);
-
-    struct Point off = (struct Point) {
-        .x = (offx - (game->size.x + 2 + INFO_PANEL_WIDTH )) / 2,
-        .y = (offy - (game->config.VISIBLE_STRIPS + 2)) / 2,
-    };
+    (void)offy;
 
     WINDOW * game_border = subwin(
         main_window,
         game->config.VISIBLE_STRIPS * CELL_HEIGHT + 2,
-        game->size.x + 2,
-        off.y - 1, off.x - 1
+        game->size.x * CELL_WIDTH + 2,
+        0, (offx - (game->size.x * CELL_WIDTH)) / 2 - 1
     );
     game->window = derwin(
         game_border,
         game->config.VISIBLE_STRIPS * CELL_HEIGHT,
-        game->size.x,
+        game->size.x * CELL_WIDTH,
         1, 1
     );
-    fprintf(stderr, "%d %d\n", off.x, off.y);
+    
     game->info_panel = derwin(
         main_window,
         INFO_PANEL_HEIGHT, INFO_PANEL_WIDTH,
-        (offy - (INFO_PANEL_HEIGHT)) / 2, off.x + game->size.x + 2
+        game->config.VISIBLE_STRIPS * CELL_HEIGHT + 2,
+        (offx - INFO_PANEL_WIDTH) / 2
     );
 
     cbreak();

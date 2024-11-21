@@ -15,23 +15,24 @@ void render_leaderboard(struct Game * game) {
     WINDOW * window = game->info_panel;
     Player * leaderboard = game->leaderboard;
 
-    mvwaddstr(window, 2, (INFO_PANEL_WIDTH - 12) >> 1, "LEADERBOARD:");
+    mvwaddstr(window, 0, (INFO_PANEL_WIDTH - 12) >> 1, " SCOREBOARD ");
     
     char leaderboard_line[INFO_PANEL_WIDTH * 2] = { 0 };
     for (int i = 0; i < game->player_count; i++) {
-        sprintf(leaderboard_line, " %1d: %-20s", i + 1, leaderboard[i].name);
-        mvwaddstr(window, 3 + i * 2,     1, leaderboard_line);
-
-        sprintf(leaderboard_line, "  : %05lu", leaderboard[i].score);
-        mvwaddstr(window, 3 + i * 2 + 1, 1, leaderboard_line);
+        sprintf(
+            leaderboard_line,
+            " %1d: %-20s  : %05lu",
+            i + 1, leaderboard[i].name, leaderboard[i].score
+        );
+        mvwaddstr(window, 1 + i, 2, leaderboard_line);
     }
 }
 
 void render_game_state(struct Game * game) {
-    WINDOW * window = game->info_panel;
+    WINDOW * window = game->window;
     char buffer[100] = { 0 };
     int lenght = sprintf(buffer, " Score: %05lu ", game->score);
-    mvwaddstr(window, 0, ((INFO_PANEL_WIDTH - lenght) >> 1), buffer);
+    mvwaddstr(window, 0, ((game->size.x * CELL_WIDTH - lenght) >> 1), buffer);
 }
 
 #define ConfigRead(config, field)          \
