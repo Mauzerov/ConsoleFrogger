@@ -8,9 +8,30 @@
 #include "entity.h"
 
 void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
-    static char symbols[]  = "# @&~=_OT";
+    static char textures
+        [Symbol_Count][CELL_WIDTH * CELL_HEIGHT] = {
+        "######",
+        "      ",
+        "7_P@^@",
+        "J&L 8 ",
+        "~~--~-",
+        "/====/",
+        "   ___",
+        "JDLo^o",
+        "T#Xo^o",
+    };
+
     wattron(window, COLOR_PAIR(symbol));
-    mvwaddch(window, game->cursor.y, game->cursor.x, symbols[symbol]);
+    for (int i = 0; i < CELL_HEIGHT; i++) {
+        for (int j = 0; j < CELL_WIDTH; j++) {
+            mvwaddch(
+                window,
+                game->cursor.y * CELL_HEIGHT + i,
+                game->cursor.x * CELL_WIDTH + j,
+                textures[symbol][i * CELL_WIDTH + j]
+            );
+        }
+    }
 }
 
 void render_strip(WINDOW * window, Strip * self, struct Game * game) {
@@ -46,6 +67,34 @@ Strip * _create_strip_common(struct Game * game) {
  * 
  **/
 
+int get_strip_index(Strip * self, Strip ** strips) {
+    int strip_y = 0;
+    while (strips[strip_y] != self) strip_y++;
+        return strip_y;
+}
+
+void _update_entity_moveable(
+    Strip * self,
+    struct Game * game,
+    struct Entity * head,
+    int entity_y
+) {
+    int player_moved = game->strips[game->player.y] != self;
+    // TODO: use _P (possibly rename)
+    int player_near = (abs(game->player.y - entity_y) <= 1)
+                    && abs(((int)game->player.x - (int)head->position + game->size.x) % game->size.x) <= 2;
+    if (head->player_near == NULL || !player_near) {
+        // and move player along if wasn't moved already
+        if (!player_moved && is_entity_at(head, game->player.x, game)) {
+            moveby(&game->player.x, self->direction, game->size.x);
+            player_moved = 1;
+        }
+        moveby(&head->position, self->direction, game->size.x);
+    } else {
+        head->player_near(head);
+    }
+}
+
 void _update_strip_moveable(Strip * self, struct Game * game) {
     assert(self->direction != 0 && self->velocity &&
             "Movable Strip cannot be static!");
@@ -53,16 +102,11 @@ void _update_strip_moveable(Strip * self, struct Game * game) {
     if ((self->state = (self->state + 1) % self->velocity) != 0)
         return;
 
-    int player_moved = game->strips[game->player.y] != self;
+    int strip_y = get_strip_index(self, game->strips);
     // if strip should be moved; move all its entities
     struct Entity * head = self->entities;
     while (head != NULL) {
-        // and move player along if wasn't moved already
-        if (!player_moved && is_entity_at(head, game->player.x, game)) {
-            moveby(&game->player.x, self->direction, game->size.x);
-            player_moved = 1;
-        }
-        moveby(&head->position, self->direction, game->size.x);
+        _update_entity_moveable(self, game, head, strip_y);
         head = head->next;
     }
 
@@ -174,7 +218,8 @@ Strip * create_strip_river(struct Game * game) {
 Strip * create_strip_road(struct Game * game) {
     Entity fg[] = {
         { Car,  .width = 1, .type = Evil },
-        { Car,  .width = 1, .type = Evil },
+        { Car,  .width = 1, .type = Evil,
+                .player_near = player_near_car },
         { Taxi, .width = 1 }
     };
     return _create_strip_movable(
