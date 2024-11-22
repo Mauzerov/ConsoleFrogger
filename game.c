@@ -12,6 +12,14 @@ unsigned _P(int point, struct Game * game) {
 extern int read_leaderboard(Player[LEADERBOARD_SIZE]);
 extern void render_leaderboard(struct Game * game);
 
+/**
+ *  CCCC   OOOOO  NN   N EEEEE IIII  GGGGG 
+ * CC  CC OO   OO NNN  N EE     II  GG     
+ * CC     OO   OO N NN N EEEE   II  GG GGG 
+ * CC  CC OO   OO N  NNN EE     II  GG  GG 
+ *  CCCC   OOOOO  N   NN EE    IIII  GGGG  
+ **/
+
 #define ConfigRead(config, field)           \
     if (strcmp(#field, buffer) == 0) {      \
         fscanf(file, "%d", &config->field); \
@@ -69,6 +77,14 @@ int moveby(void * _pos, int by, int size) {
     return *pos;
 }
 
+/**
+ *  IIII NN   N IIII TTTTTT 
+ *   II  NNN  N  II  TTTTTT 
+ *   II  N NN N  II    TT   
+ *   II  N  NNN  II    TT   
+ *  IIII N   NN IIII   TT 
+ **/
+
 void init_strips(struct Game * game) {
     struct Strip*(*StripConstructors[])(struct Game *) = {
         create_strip_river,
@@ -117,6 +133,14 @@ void init_game(struct Game * game) {
     init_strips(game);
 }
 
+/**
+ * UU  UU PPPPP  DDDDD    AA   TTTTTT EEEEE 
+ * UU  UU PP  PP DD  DD  AAAA  TTTTTT EE    
+ * UU  UU PPPPP  DD  DD  A  A    TT   EEEE  
+ * UUUUUU PP     DD  DD AAAAAA   TT   EE    
+ *  UUUU  PP     DDDDD  AA  AA   TT   EEEEE
+ **/
+
 unsigned resolve_player_collisions(Strip * strip, struct Game * game) {
     struct Entity * head = strip->entities;
     unsigned collitions = 0;
@@ -149,6 +173,14 @@ void update_game(struct Game * game) {
     if (resolve_player_collisions(playerStrip, game) == 0u)
         invoke(playerStrip->collide, game);
 }
+
+/**
+ * DDDDD  EEEEE  SSSSS TTTTTT RRRRR  UU  UU  CCCC  TTTTTT 
+ * DD  DD EE    SS     TTTTTT RR  RR UU  UU CC  CC TTTTTT 
+ * DD  DD EEEE   SSSS    TT   RRRRR  UU  UU CC       TT   
+ * DD  DD EE        SS   TT   RR  RR UUUUUU CC  CC   TT   
+ * DDDDD  EEEEE SSSSS    TT   RR  RR  UUUU   CCCC    TT  
+ **/
 
 void destroy_game(struct Game * game) {
     for (int i = 0; i < game->size.y; i++) {

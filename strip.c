@@ -7,37 +7,6 @@
 #include "game.h"
 #include "entity.h"
 
-void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
-    wattron(window, COLOR_PAIR(symbol));
-    assert(symbol > 0);
-    for (int i = 0; i < CELL_HEIGHT; i++) {
-        for (int j = 0; j < CELL_WIDTH; j++) {
-            mvwaddch(
-                window,
-                game->cursor.y * CELL_HEIGHT + i,
-                game->cursor.x * CELL_WIDTH + j,
-                game->textures[symbol][i * CELL_WIDTH + j]
-            );
-        }
-    }
-}
-
-void render_strip(WINDOW * window, Strip * self, struct Game * game) {
-    int cursor_x = game->cursor.x;
-    for (int i = 0; i < game->size.x; i++) {
-        render_symbol(window, self->bg, game);
-        game->cursor.x++;
-    }
-    struct Entity * head = self->entities;
-    while (head != NULL) {
-        for (unsigned i = 0; i < head->width; i++) {
-            game->cursor.x = cursor_x + (head->position + i) % game->size.x;
-            render_symbol(window, head->symbol, game);
-        }
-        head = head->next;
-    }
-}
-
 Strip * _create_strip_common(struct Game * game) {
     Strip* self = malloc(sizeof(Strip));
     self->render = render_strip;
@@ -234,6 +203,14 @@ Strip * create_strip_forest(struct Game * game) {
 Strip * create_strip_empty(struct Game * game) {
     return _create_strip_common(game);
 }
+
+/**
+ * DDDDD  EEEEE  SSSSS TTTTTT RRRRR  UU  UU  CCCC  TTTTTT 
+ * DD  DD EE    SS     TTTTTT RR  RR UU  UU CC  CC TTTTTT 
+ * DD  DD EEEE   SSSS    TT   RRRRR  UU  UU CC       TT   
+ * DD  DD EE        SS   TT   RR  RR UUUUUU CC  CC   TT   
+ * DDDDD  EEEEE SSSSS    TT   RR  RR  UUUU   CCCC    TT  
+ **/
 
 void destroy_linked_list(struct Entity * entity) {
     if (entity != NULL) {
