@@ -4,24 +4,6 @@
 #include "game.h"
 
 
-void render_leaderboard(struct Game * game) {
-    WINDOW * window = game->info_panel;
-    Player * leaderboard = game->leaderboard;
-
-    mvwaddstr(window, 0, (INFO_PANEL_WIDTH - 12) >> 1, " SCOREBOARD ");
-    
-    char leaderboard_line[INFO_PANEL_WIDTH * 2] = { 0 };
-    for (int i = 0; i < game->player_count; i++) {
-        sprintf(
-            leaderboard_line,
-            " %1d: %-20s  : %05lu",
-            i + 1, leaderboard[i].name, leaderboard[i].score
-        );
-        mvwaddstr(window, 1 + i, 2, leaderboard_line);
-    }
-}
-
-
 int order_players(const void * a, const void * b) {
     return ((Player *)a)->score - ((Player *)b)->score;
 }

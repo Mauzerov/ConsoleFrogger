@@ -12,13 +12,6 @@ unsigned _P(int point, struct Game * game) {
 extern int read_leaderboard(Player[LEADERBOARD_SIZE]);
 extern void render_leaderboard(struct Game * game);
 
-void render_game_state(struct Game * game) {
-    WINDOW * window = game->window;
-    char buffer[100] = { 0 };
-    int lenght = sprintf(buffer, " Score: %05lu ", game->score);
-    mvwaddstr(window, 0, ((game->size.x * CELL_WIDTH - lenght) >> 1), buffer);
-}
-
 #define ConfigRead(config, field)           \
     if (strcmp(#field, buffer) == 0) {      \
         fscanf(file, "%d", &config->field); \
@@ -124,44 +117,6 @@ void init_game(struct Game * game) {
     init_strips(game);
 }
 
-void render_border(WINDOW * window, struct Game * game) {
-    int height = game->size.y + 1;
-    int width  = game->size.x + 1;
-
-    for (int y = 0; y <= height; y++) {
-        for (int x = 0; x <= width; x++) {
-            if (!!(x % width) ^ !!(y % height)) {
-                game->cursor.x = 1 + x;
-                game->cursor.y = 1 + y;
-                render_symbol(window, Border, game);
-            }
-        }
-    }
-}
-
-void render_game(struct Game * game) {
-    WINDOW * window = game->window;
-
-    int visibility = game->config.VISIBLE_STRIPS;
-    int scroll = clamp(
-        0, game->player.y - game->config.VISIBLE_AHEAD, game->size.y - visibility
-    );
-
-    for (int i = 0; i < visibility; i++) {
-        game->cursor.y = i;
-        game->cursor.x = 0;
-        invoke(
-            game->strips[i + scroll]->render,
-            window, game->strips[i + scroll], game
-        );
-    }
-
-    game->cursor.x = game->player.x;
-    game->cursor.y = game->player.y - scroll;
-    render_symbol(window, Frog, game);
-    attron(COLOR_PAIR(Null));
-}
-
 unsigned resolve_player_collisions(Strip * strip, struct Game * game) {
     struct Entity * head = strip->entities;
     unsigned collitions = 0;
@@ -177,7 +132,7 @@ unsigned resolve_player_collisions(Strip * strip, struct Game * game) {
 
 void update_game(struct Game * game) {
     Strip * playerStrip = game->strips[game->player.y];
-    game->score++;
+    game->score++; // TODO: update score handling
 
     if (game->player.y == 0) {
         end_game(game, WIN);
