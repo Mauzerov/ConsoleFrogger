@@ -103,13 +103,6 @@ void calculate_time_difference(
 }
 
 void main_loop(struct Game * game) {
-    // Todo: implement 100% cpu usage loop using `clock_gettime`
-    //       check if enough time has passed for an update to happen
-    //       possibly sleep for like 2ms so the cpu isn't abused (2ms might in theory be worse)
-    //       store time_update in entity, pass `dt` to update (?)
-    //                not sure how to handle passed time if entities have different values
-    //                possibly store the passed time inside the entity aswell?
-    //       :Essaying:
     int key = ERR;
     struct timespec start, end;
     clock_gettime(CLOCK_REALTIME, &start);
