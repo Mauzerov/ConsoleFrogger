@@ -55,7 +55,10 @@ void render_game_state(struct Game * game) {
     WINDOW * window = game->window;
     char buffer[100] = { 0 };
     int lenght = sprintf(buffer, " Score: %05lu ", game->score);
-    mvwaddstr(window, 0, ((game->size.x * CELL_WIDTH - lenght) >> 1), buffer);
+    mvwaddstr(window,
+        0, ((game->size.x * CELL_WIDTH - lenght) >> 1),
+        buffer
+    );
 }
 
 void render_border(WINDOW * window, struct Game * game) {
