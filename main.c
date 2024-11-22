@@ -123,7 +123,7 @@ void main_loop(struct Game * game) {
         if (_key != ERR)
             key = _key;
 
-        if (end.tv_nsec > 200000000) {
+        if (end.tv_nsec > game->config.TIMEOUT * MICRO_SECONDS) {
             render_game(game);
             render_game_state (game);
             

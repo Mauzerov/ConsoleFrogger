@@ -7,6 +7,8 @@
 #include <curses.h>
 #endif
 
+#define MICRO_SECONDS 1000000
+
 #define invoke(func, ...) do {            \
     if (func != NULL) func(__VA_ARGS__);  \
 } while (0)
