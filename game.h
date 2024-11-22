@@ -75,7 +75,7 @@ void render_border(WINDOW *, struct Game *);
 
 void render_game(struct Game *);
 
-unsigned resolve_player_collisions(struct Strip *, struct Game *);
+unsigned handle_player_collisions(struct Strip *, struct Game *);
 
 unsigned _P(int, struct Game *);
 

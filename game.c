@@ -141,7 +141,7 @@ void init_game(struct Game * game) {
  *  UUUU  PP     DDDDD  AA  AA   TT   EEEEE
  **/
 
-unsigned resolve_player_collisions(Strip * strip, struct Game * game) {
+unsigned handle_player_collisions(Strip * strip, struct Game * game) {
     struct Entity * head = strip->entities;
     unsigned collisions = 0;
     while (head != NULL) {
@@ -163,14 +163,14 @@ void update_game(struct Game * game) {
         return; // if player won no need to check collisions
     }
     
-    if (resolve_player_collisions(playerStrip, game) == 0u)
+    if (handle_player_collisions(playerStrip, game) == 0u)
         invoke(playerStrip->collide, game);
 
     for (int i = 0; i < game->size.y; i++) {
         invoke(game->strips[i]->update, game->strips[i], game);
     }
     // second call required, so that the fail screen isn't awkward
-    if (resolve_player_collisions(playerStrip, game) == 0u)
+    if (handle_player_collisions(playerStrip, game) == 0u)
         invoke(playerStrip->collide, game);
 }
 
