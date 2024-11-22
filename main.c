@@ -123,7 +123,7 @@ void main_loop(struct Game * game) {
             render_game_state (game);
             
             wrefresh(game->info_panel);
-            wrefresh(game->window);
+            // wrefresh(game->window);
             wrefresh(wgetparent(game->window));
             handle_key_down(game, key);
             update_game(game);
