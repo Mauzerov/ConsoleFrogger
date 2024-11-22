@@ -10,23 +10,7 @@ unsigned _P(int point, struct Game * game) {
 }
 
 extern int read_leaderboard(Player[LEADERBOARD_SIZE]);
-
-void render_leaderboard(struct Game * game) {
-    WINDOW * window = game->info_panel;
-    Player * leaderboard = game->leaderboard;
-
-    mvwaddstr(window, 0, (INFO_PANEL_WIDTH - 12) >> 1, " SCOREBOARD ");
-    
-    char leaderboard_line[INFO_PANEL_WIDTH * 2] = { 0 };
-    for (int i = 0; i < game->player_count; i++) {
-        sprintf(
-            leaderboard_line,
-            " %1d: %-20s  : %05lu",
-            i + 1, leaderboard[i].name, leaderboard[i].score
-        );
-        mvwaddstr(window, 1 + i, 2, leaderboard_line);
-    }
-}
+extern void render_leaderboard(struct Game * game);
 
 void render_game_state(struct Game * game) {
     WINDOW * window = game->window;
@@ -35,8 +19,8 @@ void render_game_state(struct Game * game) {
     mvwaddstr(window, 0, ((game->size.x * CELL_WIDTH - lenght) >> 1), buffer);
 }
 
-#define ConfigRead(config, field)          \
-    if (strcmp(#field, buffer) == 0) {     \
+#define ConfigRead(config, field)           \
+    if (strcmp(#field, buffer) == 0) {      \
         fscanf(file, "%d", &config->field); \
     }
 
@@ -138,16 +122,6 @@ void init_game(struct Game * game) {
     game->strips = malloc(game->size.y * sizeof(struct Strip *));
 
     init_strips(game);
-}
-
-struct Point get_offset(struct Game * game) {
-    int offx, offy;
-    getmaxyx(stdscr, offy, offx);
-
-    return (struct Point) {
-        .x = (offx - (game->size.x + 2)) / 2,
-        .y = (offy - (game->size.y + 2)) / 2 - 2,
-    };
 }
 
 void render_border(WINDOW * window, struct Game * game) {

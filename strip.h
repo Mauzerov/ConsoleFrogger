@@ -40,9 +40,9 @@ void _update_strip_moveable(Strip *, struct Game *);
 
 int is_entity_at(Entity *, unsigned, struct Game *);
 
-int add_entity_at(Strip *, Entity *, Symbol, struct Game *, int);
+int add_entity_at(Strip *, Entity *, struct Game *, int);
 
-int add_entity(Strip *, Entity *, Symbol, struct Game *);
+int add_entity(Strip *, Entity *, struct Game *);
 
 int get_strip_index(Strip *, Strip **);
 

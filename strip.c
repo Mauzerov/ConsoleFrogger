@@ -100,11 +100,7 @@ void _update_strip_moveable(Strip * self, struct Game * game) {
 
 }
 
-int is_entity_at(
-    Entity * entity,
-    unsigned index,
-    struct Game * game
-) {
+int is_entity_at(Entity * entity, unsigned index, struct Game * game) {
     // Todo: Validate this logic
     // maybe convert it to math (2 conditions)
     // checking if a point is in a range that is periodic is weird
@@ -118,13 +114,9 @@ int is_entity_at(
 int add_entity_at(
     Strip * self,
     Entity * entity,
-    Symbol bg,
     struct Game * game,
     int position
 ) {
-    (void)game;
-    (void)bg;
-
     entity->position = position != -1 ? position : rand() % game->size.x;
 
     if (self->entities == NULL){
@@ -144,8 +136,8 @@ int add_entity_at(
 }
 
 
-int add_entity(Strip * self, Entity * entity, Symbol bg, struct Game * game) {
-    return add_entity_at(self, entity, bg, game, -1);
+int add_entity(Strip * self, Entity * entity, struct Game * game) {
+    return add_entity_at(self, entity, game, -1);
 }
 
 Strip * _create_strip_movable(
@@ -162,7 +154,7 @@ Strip * _create_strip_movable(
 
     for (size_t i = 0; i < fg_count; i++) {
         Entity entity = fg[rand() % n_fg];
-        add_entity(self, &entity, bg, game);
+        add_entity(self, &entity, game);
     }
     self->entity_count = fg_count;
     return self;
@@ -234,7 +226,7 @@ Strip * create_strip_forest(struct Game * game) {
     Strip * self = _create_strip_common(game);
 
     for (int i = 0 ; i < game->config.TREES_PER_STRIP; i++) {
-        add_entity(self, fg, Null, game);
+        add_entity(self, fg, game);
     }
     return self;
 }
