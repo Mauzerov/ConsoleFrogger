@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#define MAX_GAME_WIDTH  45
+#define MAX_GAME_WIDTH  30
 #define MAX_GAME_HEIGHT 100
 
 #define CELL_WIDTH 3

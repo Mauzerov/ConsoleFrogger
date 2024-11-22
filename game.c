@@ -148,7 +148,7 @@ unsigned handle_player_collisions(Strip * strip, struct Game * game) {
         if (is_entity_at(head, game->player.x, game)) {
             handle_entity_collision(head, game);
             collisions++;
-        }        
+        }
         head = head->next;
     }
     return collisions;
