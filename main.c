@@ -45,6 +45,8 @@ WINDOW * init_curses(const struct Config * config) {
     init_pair(Taxi ,  COLOR_YELLOW, COLOR_BLACK);
     init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
 
+    fprintf(stderr, "%#x\n", COLOR_PAIR(Null));
+
     curs_set(0);
     noecho();
     return window;
@@ -96,7 +98,7 @@ void calculate_time_difference(
     // Calculate difference in nanoseconds
     if (end->tv_nsec < start->tv_nsec) {
         end->tv_sec -= 1; // Borrow 1 second
-        end->tv_nsec = 1000000000 + end->tv_nsec - start->tv_nsec;
+        end->tv_nsec = SECONDS * MICRO_SECONDS + end->tv_nsec - start->tv_nsec;
     } else {
         end->tv_nsec -= start->tv_nsec;
     }
@@ -122,6 +124,7 @@ void main_loop(struct Game * game) {
             
             wrefresh(game->info_panel);
             wrefresh(game->window);
+            wrefresh(wgetparent(game->window));
             handle_key_down(game, key);
             update_game(game);
             clock_gettime(CLOCK_REALTIME, &start);

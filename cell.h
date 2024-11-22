@@ -27,6 +27,7 @@ struct Game;
 struct Cell {
     Symbol symbol;
     CellType type;
+    short color;
 };
 
 typedef struct Cell Cell;

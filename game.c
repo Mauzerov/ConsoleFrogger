@@ -119,10 +119,11 @@ void init_game(struct Game * game) {
     game->player_count = read_leaderboard(game->leaderboard);
 
     if (game->size.x == 0 || game->size.x > MAX_GAME_WIDTH) {
-        // Todo: add error message
+        WARN("Game size exceeded maximum width %d > %d.", game->size.x, MAX_GAME_WIDTH);
         game->size.x = MAX_GAME_WIDTH;
     }
     if (game->size.y == 0 || game->size.y > MAX_GAME_HEIGHT) {
+        WARN("Game size exceeded maximum height %d > %d.", game->size.y, MAX_GAME_HEIGHT);
         game->size.y = MAX_GAME_HEIGHT;
     }
 

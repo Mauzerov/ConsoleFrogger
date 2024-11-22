@@ -52,11 +52,13 @@ void render_leaderboard(struct Game * game) {
 }
 
 void render_game_state(struct Game * game) {
-    WINDOW * window = game->window;
+    WINDOW * window = wgetparent(game->window);
+    LOG("%p", (void*)window);
     char buffer[100] = { 0 };
     int lenght = sprintf(buffer, " Score: %05lu ", game->score);
+    (void)lenght;
     mvwaddstr(window,
-        0, ((game->size.x * CELL_WIDTH - lenght) >> 1),
+        0, ((game->size.x * CELL_WIDTH - lenght + 2) >> 1),
         buffer
     );
 }
