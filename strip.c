@@ -117,7 +117,7 @@ Strip * _create_strip_movable(
     Strip * self = _create_strip_common(game);
 
     self->direction = (rand() & 1) ? UPDATE_RIGHT : UPDATE_LEFT;
-    self->velocity  = (rand() % game->config.CHANCE_OF_SLOW_STRIP == 0) + 1;
+    self->velocity  = ((rand() % 100) < game->config.CHANCE_OF_SLOW_STRIP) + 1;
     self->update = _update_strip_moveable;
     self->bg = bg;
 
