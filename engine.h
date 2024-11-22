@@ -17,8 +17,9 @@
         __VA_ARGS__                      \
     );                                   
 
-#define WARN(...)  DEBUG_PRINT(WARN,  __VA_ARGS__)
-#define LOG(...)   DEBUG_PRINT(LOG,   __VA_ARGS__)
+#define LOG  (...) DEBUG_PRINT(LOG  , __VA_ARGS__)
+#define INFO (...) DEBUG_PRINT(INFO , __VA_ARGS__)
+#define WARN (...) DEBUG_PRINT(WARN , __VA_ARGS__)
 #define ERROR(...) DEBUG_PRINT(ERROR, __VA_ARGS__)
 
 
