@@ -8,7 +8,7 @@
 #include "entity.h"
 
 Strip * _create_strip_common(struct Game * game) {
-    Strip* self = malloc(sizeof(Strip));
+    Strip* self = calloc(1, sizeof(Strip));
     self->render = render_strip;
     self->bg = Null;
     (void)game;
@@ -89,7 +89,7 @@ int add_entity_at(
     entity->position = position != -1 ? position : rand() % game->size.x;
 
     if (self->entities == NULL){
-        self->entities = malloc(sizeof(Entity));
+        self->entities = calloc(1, sizeof(Entity));
         memcpy(self->entities, entity, sizeof(Entity));
         return 1;
     }
