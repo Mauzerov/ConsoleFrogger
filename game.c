@@ -143,15 +143,15 @@ void init_game(struct Game * game) {
 
 unsigned resolve_player_collisions(Strip * strip, struct Game * game) {
     struct Entity * head = strip->entities;
-    unsigned collitions = 0;
+    unsigned collisions = 0;
     while (head != NULL) {
         if (is_entity_at(head, game->player.x, game)) {
             handle_entity_collision(head, game);
-            collitions++;
+            collisions++;
         }        
         head = head->next;
     }
-    return collitions;
+    return collisions;
 }
 
 void update_game(struct Game * game) {
