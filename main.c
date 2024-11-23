@@ -33,7 +33,7 @@ WINDOW * init_curses(const struct Config * config) {
     (void)config;
     WINDOW * window = initscr();
     
-    fprintf(stderr, "Colors: %d\n", has_colors());
+    INFO("Colors: %d", has_colors());
     start_color();
 
     init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
@@ -45,7 +45,7 @@ WINDOW * init_curses(const struct Config * config) {
     init_pair(Taxi ,  COLOR_YELLOW, COLOR_BLACK);
     init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
 
-    fprintf(stderr, "%#x\n", COLOR_PAIR(Null));
+    LOG("%#x", COLOR_PAIR(Null));
 
     curs_set(0);
     noecho();
@@ -89,8 +89,8 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
 
 
 void calculate_time_difference(
-    struct timespec *end,
-    const struct timespec *start
+    struct timespec       * end,
+    const struct timespec * start
 ) {
     // Calculate difference in seconds
     end->tv_sec -= start->tv_sec;
@@ -110,6 +110,7 @@ void main_loop(struct Game * game) {
     clock_gettime(CLOCK_REALTIME, &start);
     render_game(game);
     render_leaderboard(game);
+
     do {
         clock_gettime(CLOCK_REALTIME, &end);
         calculate_time_difference(&end, &start);
@@ -123,10 +124,11 @@ void main_loop(struct Game * game) {
             render_game_state(game);
             
             wrefresh(game->info_panel);
-            // wrefresh(game->window);
             wrefresh(wgetparent(game->window));
+
             handle_key_down(game, key);
             update_game(game);
+
             clock_gettime(CLOCK_REALTIME, &start);
             key = ERR;
         }
@@ -141,7 +143,6 @@ int main() {
     read_config_file(&game);
     int seed = game.config.SEED ? game.config.SEED : time(NULL);
     srand(seed);
-
     init_game(&game);
 
     WINDOW * main_window = init_curses(&game.config);
@@ -150,7 +151,7 @@ int main() {
 
     main_loop(&game);
 
-    fprintf(stderr, "Game Ended with %d\n", game.over);
+    INFO("Game Ended with %d", game.over);
     if (game.over == WIN) {
         read_player_name(&game);
     }
