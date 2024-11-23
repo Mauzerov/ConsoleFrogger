@@ -15,6 +15,12 @@ Strip * _create_strip_common(struct Game * game) {
     return self;
 }
 
+int get_strip_index(Strip * self, Strip ** strips) {
+    int strip_y = 0;
+    while (strips[strip_y] != self) strip_y++;
+        return strip_y;
+}
+
 /**
  *  MM   MM  OOOOO  VV    VV  AA   BBBBB  LL    EEEEEE
  *  MMM MMM OO   OO  VV  VV  AAAA  B   BB LL    EE   
@@ -24,12 +30,6 @@ Strip * _create_strip_common(struct Game * game) {
  * 
  **/
 
-int get_strip_index(Strip * self, Strip ** strips) {
-    int strip_y = 0;
-    while (strips[strip_y] != self) strip_y++;
-        return strip_y;
-}
-
 void _update_entity_moveable(
     Strip * self,
     struct Game * game,
@@ -38,6 +38,10 @@ void _update_entity_moveable(
 ) {
     if ((head->state = (head->state + 1) % head->velocity) != 0)
         return;
+    if (self->has_random_velocity
+        && rand() % 100 < game->config.CHANCE_OF_SPEED_CHANGE) {
+        head->velocity = 1 + (head->velocity != 2);
+    }
 
     int player_moved = game->strips[game->player.y] != self;
     // TODO: use _P (possibly rename)
@@ -91,6 +95,7 @@ int add_entity_at(
 ) {
     entity->position = position != -1 ? position : rand() % game->size.x;
     entity->velocity = self->velocity;
+
     if (self->entities == NULL){
         self->entities = calloc(1, sizeof(Entity));
         memcpy(self->entities, entity, sizeof(Entity));
@@ -174,12 +179,14 @@ Strip * create_strip_road(struct Game * game) {
                 .player_near = player_near_car },
         { Taxi, .width = 1 }
     };
-    return _create_strip_movable(
+    Strip * self = _create_strip_movable(
         Curb,
         fg, sizeof(fg) / sizeof (fg[0]),
         game->config.CARS_PER_STRIP,
         game
     );
+    self->has_random_velocity = TRUE;
+    return self;
 }
 
 /** 

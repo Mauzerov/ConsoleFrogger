@@ -46,6 +46,7 @@ void read_game_config(FILE * file, struct Config * config, char * buffer) {
     ConfigRead(config, TIMEOUT);
     ConfigRead(config, VISIBLE_STRIPS);
     ConfigRead(config, VISIBLE_AHEAD);
+    ConfigRead(config, CHANCE_OF_SPEED_CHANGE);
 }
 
 void read_config_file(struct Game * game) {

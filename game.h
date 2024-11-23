@@ -39,7 +39,8 @@ struct Config {
         CHANCE_OF_SLOW_STRIP,
         TIMEOUT,
         VISIBLE_STRIPS,
-        VISIBLE_AHEAD
+        VISIBLE_AHEAD,
+        CHANCE_OF_SPEED_CHANGE
     ;
 };
 

@@ -23,7 +23,7 @@ struct Strip {
     void (*collide)  (struct Game *);
     // Movable Strip definition
     int direction;
-    int state, velocity;
+    int has_random_velocity, velocity;
     int entity_count;
 };
 
