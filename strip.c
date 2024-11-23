@@ -36,6 +36,9 @@ void _update_entity_moveable(
     struct Entity * head,
     int entity_y
 ) {
+    if ((head->state = (head->state + 1) % head->velocity) != 0)
+        return;
+
     int player_moved = game->strips[game->player.y] != self;
     // TODO: use _P (possibly rename)
     int player_near = (abs(game->player.y - entity_y) <= 1)
@@ -56,8 +59,8 @@ void _update_strip_moveable(Strip * self, struct Game * game) {
     assert(self->direction != 0 && self->velocity &&
             "Movable Strip cannot be static!");
     
-    if ((self->state = (self->state + 1) % self->velocity) != 0)
-        return;
+    // if ((self->state = (self->state + 1) % self->velocity) != 0)
+    //     return;
 
     int strip_y = get_strip_index(self, game->strips);
     // if strip should be moved; move all its entities
@@ -87,7 +90,7 @@ int add_entity_at(
     int position
 ) {
     entity->position = position != -1 ? position : rand() % game->size.x;
-
+    entity->velocity = self->velocity;
     if (self->entities == NULL){
         self->entities = calloc(1, sizeof(Entity));
         memcpy(self->entities, entity, sizeof(Entity));

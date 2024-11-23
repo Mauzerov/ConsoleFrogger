@@ -32,7 +32,7 @@ void handle_key_down(struct Game * game, int keycode) {
 WINDOW * init_curses(const struct Config * config) {
     (void)config;
     WINDOW * window = initscr();
-    // wtimeout(window, 0);
+    
     fprintf(stderr, "Colors: %d\n", has_colors());
     start_color();
 
@@ -120,7 +120,7 @@ void main_loop(struct Game * game) {
 
         if (end.tv_nsec > game->config.TIMEOUT * MICRO_SECONDS) {
             render_game(game);
-            render_game_state (game);
+            render_game_state(game);
             
             wrefresh(game->info_panel);
             // wrefresh(game->window);
@@ -133,7 +133,7 @@ void main_loop(struct Game * game) {
     } while (!game->over);
 
     render_game(game);
-    render_game_state (game);
+    render_game_state(game);
 }
 
 int main() {
