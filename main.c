@@ -137,10 +137,11 @@ void main_loop(struct Game * game) {
 }
 
 int main() {
-    srand(time(NULL));
-    srand(rand());
-    srand(rand());
     struct Game game = { 0 };
+    read_config_file(&game);
+    int seed = game.config.SEED ? game.config.SEED : time(NULL);
+    srand(seed);
+
     init_game(&game);
 
     WINDOW * main_window = init_curses(&game.config);

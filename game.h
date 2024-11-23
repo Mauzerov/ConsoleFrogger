@@ -38,6 +38,7 @@ struct Config {
         TREES_PER_STRIP,
         CHANCE_OF_SLOW_STRIP,
         TIMEOUT,
+        SEED,
         VISIBLE_STRIPS,
         VISIBLE_AHEAD,
         CHANCE_OF_SPEED_CHANGE

@@ -47,6 +47,7 @@ void read_game_config(FILE * file, struct Config * config, char * buffer) {
     ConfigRead(config, VISIBLE_STRIPS);
     ConfigRead(config, VISIBLE_AHEAD);
     ConfigRead(config, CHANCE_OF_SPEED_CHANGE);
+    ConfigRead(config, SEED);
 }
 
 void read_config_file(struct Game * game) {
@@ -115,8 +116,6 @@ void init_strips(struct Game * game) {
 }
 
 void init_game(struct Game * game) {
-    read_config_file(game);
-
     game->player_count = read_leaderboard(game->leaderboard);
 
     if (game->size.x == 0 || game->size.x > MAX_GAME_WIDTH) {
