@@ -10,12 +10,16 @@
 #define SECONDS 1000
 #define MICRO_SECONDS 1000000
 
+#ifdef DEBUG
 #define DEBUG_PRINT(level, message, ...) \
     fprintf(stderr,                      \
         "[%-5s: %s:%d]: " message "\n",  \
         #level, __FILE__, __LINE__,      \
         __VA_ARGS__                      \
-    );                                   
+    );
+#else
+#define DEBUG_PRINT(...)
+#endif
 
 #define LOG(...)   DEBUG_PRINT(LOG  , __VA_ARGS__)
 #define INFO(...)  DEBUG_PRINT(INFO , __VA_ARGS__)
