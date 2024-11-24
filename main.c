@@ -12,7 +12,8 @@ extern void read_player_name(struct Game * game);
 int define_new_color(short r, short g, short b) {
     static int color_count = 0;
     int index = COLOR_OFFSET - ++color_count;
-    init_color(index, r, g, b);
+    int err = init_color(index, r, g, b);
+    INFO("new_color: %d rgb(%hd %hd %hd)", err, r, g, b);
     return -color_count;
 }
 
@@ -36,15 +37,12 @@ void handle_key_down(struct Game * game, int keycode) {
     }
 }
 
-WINDOW * init_curses(const struct Game * game) {
-    WINDOW * window = initscr();
-    
+WINDOW * init_curses(WINDOW * window, const struct Game * game) {    
     INFO("Colors: %d %d %d %d %d",
         has_colors(),
         COLORS, COLOR_PAIRS,
         COLOR_BLACK, COLOR_WHITE
     );
-    start_color();
     #if 0
     init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
     init_pair(Frog ,  10          , COLOR_BLACK);
@@ -59,8 +57,6 @@ WINDOW * init_curses(const struct Game * game) {
         int res = DEFINE_COLOR(i, game->colors[i][0], game->colors[i][1], game->colors[i][2]);
         INFO("%d %d", i, res);
     }
-    const short * bg_color = game->colors[Water];
-    define_new_color(bg_color[0] * .55, bg_color[1]* .55, bg_color[2]* .55);
 
     #endif
     LOG("%#x %#x", COLOR_PAIR(Null), (unsigned)COLOR_BLACK);
@@ -157,13 +153,14 @@ void main_loop(struct Game * game) {
 }
 
 int main() {
+    WINDOW * main_window = initscr();
+    start_color();
     struct Game game = { 0 };
     read_config_file(&game);
     const int seed = game.config.SEED ? game.config.SEED : time(NULL);
     srand(seed);
     init_game(&game);
-
-    WINDOW * main_window = init_curses(&game);
+    init_curses(main_window, &game);
 
     init_sub_windows(&game, main_window);
 

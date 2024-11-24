@@ -159,7 +159,8 @@ Strip * create_strip_river(struct Game * game) {
         game->config.LOGS_PER_STRIP,
         game
     );
-    self->bg_color = -1;
+    const short * bg_color = game->colors[Water];
+    self->bg_color = define_new_color(bg_color[0] * .55, bg_color[1]* .55, bg_color[2]* .55);
     self->collide = lose_game;
     return self;
 }
