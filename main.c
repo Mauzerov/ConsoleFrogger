@@ -29,13 +29,16 @@ void handle_key_down(struct Game * game, int keycode) {
     }
 }
 
-WINDOW * init_curses(const struct Config * config) {
-    (void)config;
+WINDOW * init_curses(const struct Game * game) {
     WINDOW * window = initscr();
     
-    INFO("Colors: %d", has_colors());
+    INFO("Colors: %d %d %d %d %d",
+        has_colors(),
+        COLORS, COLOR_PAIRS,
+        COLOR_BLACK, COLOR_WHITE
+    );
     start_color();
-
+    #if 0
     init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
     init_pair(Frog ,  10          , COLOR_BLACK);
     init_pair(Tree ,  COLOR_GREEN , COLOR_BLACK);
@@ -44,8 +47,21 @@ WINDOW * init_curses(const struct Config * config) {
     init_pair(Car  ,  COLOR_RED   , COLOR_BLACK);
     init_pair(Taxi ,  COLOR_YELLOW, COLOR_BLACK);
     init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
-
-    LOG("%#x", COLOR_PAIR(Null));
+    #else
+    for (int i = 0; i < Symbol_Count; i++) {
+        init_color(i, game->colors[i][0], game->colors[i][1], game->colors[i][2]);
+    }
+    assume_default_colors(Curb, Null);
+    init_pair(Null ,  Null , Null);
+    init_pair(Frog ,  Frog , Null);
+    init_pair(Tree ,  Tree , Null);
+    init_pair(Water,  Water, Water );
+    init_pair(Log  ,  Log  , Water );
+    init_pair(Car  ,  Car  , Null);
+    init_pair(Taxi ,  Taxi , Null);
+    init_pair(Curb ,  Curb , Null);
+    #endif
+    LOG("%#x %#x", COLOR_PAIR(Null), (unsigned)COLOR_BLACK);
 
     curs_set(0);
     noecho();
@@ -145,7 +161,7 @@ int main() {
     srand(seed);
     init_game(&game);
 
-    WINDOW * main_window = init_curses(&game.config);
+    WINDOW * main_window = init_curses(&game);
 
     init_sub_windows(&game, main_window);
 

@@ -53,7 +53,7 @@ void render_leaderboard(struct Game * game) {
 
 void render_game_state(struct Game * game) {
     WINDOW * window = wgetparent(game->window);
-    LOG("%p", (void*)window);
+    
     char buffer[MAX_GAME_WIDTH * CELL_WIDTH] = { 0 };
 
     int lenght = sprintf(buffer, " Score: %05lu ", game->score);

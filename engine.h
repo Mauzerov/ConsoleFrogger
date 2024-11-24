@@ -42,4 +42,13 @@
             (x_max)      : (x))  \
 )
 
+#define linear_scale_rgb(x) linear_scale(x, 0, 255, 0, 1000)
+
+#define linear_scale(x, min_in, max_in, min_out, max_out) (                 \
+    (((x - min_in) * (max_out - min_out)) / (max_in - min_in)) + min_out    \
+)
+
+#define HEX_TO_RGB(hex) \
+    (hex & 0xFF0000) >> 16, (hex & 0x00FF00) >> 8, (hex & 0x0000FF)
+
 #endif

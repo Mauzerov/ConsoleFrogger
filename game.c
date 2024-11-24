@@ -32,7 +32,7 @@ short hex_char_to_num(char c) {
         return c - '0';
     if ('a' <= c && c <= 'f')
         return c - 'a' + 10;
-    if ('F' <= c && c <= 'F')
+    if ('A' <= c && c <= 'F')
         return c - 'A' + 10;
     assert(0 && "Invalid Hex Value");
 }
@@ -46,11 +46,13 @@ unsigned long hex_str_to_num(const char hex_color[6]) {
 }
 
 void read_colors(struct Game * game, FILE * file) {
-    char hex_color[6] = { 0 };
     for (int i = 0; i < Symbol_Count; i++) {
-        fscanf(file, "%6s", hex_color);
-        game->colors[i] = hex_str_to_num(hex_color);
-        LOG("Color %d: %6s => %#lx", i, hex_color, game->colors[i]);
+        short r, g, b;
+        fscanf(file, " rgb( %hd , %hd , %hd )", &r, &g, &b);
+        game->colors[i][0] = linear_scale_rgb(r);
+        game->colors[i][1] = linear_scale_rgb(g);
+        game->colors[i][2] = linear_scale_rgb(b);
+        LOG("curses_rgb(%hd %hd %hd)", game->colors[i][0], game->colors[i][1], game->colors[i][2]);
     }
 }
 

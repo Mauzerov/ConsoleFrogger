@@ -59,7 +59,7 @@ struct Game {
     int over;
     unsigned long score;
     char textures[Symbol_Count][CELL_WIDTH * CELL_HEIGHT];
-    unsigned long colors[Symbol_Count];
+    short colors[Symbol_Count][3];
 };
 
 int moveby(void *, int, int);
