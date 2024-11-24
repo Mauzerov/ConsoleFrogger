@@ -27,11 +27,10 @@ struct Game;
 struct Cell {
     Symbol symbol;
     CellType type;
-    short color;
 };
 
 typedef struct Cell Cell;
 
-void render_symbol(WINDOW *, Symbol, struct Game *);
+void render_symbol(WINDOW *, Symbol, Symbol, struct Game *);
 
 #endif

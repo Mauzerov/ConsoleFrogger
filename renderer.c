@@ -3,8 +3,15 @@
 #include "engine.h"
 #include "game.h"
 
-void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
-    wattron(window, COLOR_PAIR(symbol));
+void render_symbol(
+    WINDOW * window,
+    Symbol symbol,
+    Symbol background,
+    struct Game * game
+) {
+    SET_COLOR_PAIR(symbol, symbol, background);
+    SET_TEXTCOLOR(window, symbol);
+    // wattron(window, COLOR_PAIR(symbol));
     assert(symbol > 0);
     for (int i = 0; i < CELL_HEIGHT; i++) {
         for (int j = 0; j < CELL_WIDTH; j++) {
@@ -21,14 +28,14 @@ void render_symbol(WINDOW * window, Symbol symbol, struct Game * game) {
 void render_strip(WINDOW * window, Strip * self, struct Game * game) {
     int cursor_x = game->cursor.x;
     for (int i = 0; i < game->size.x; i++) {
-        render_symbol(window, self->bg, game);
+        render_symbol(window, self->bg, self->bg_color, game);
         game->cursor.x++;
     }
     struct Entity * head = self->entities;
     while (head != NULL) {
         for (unsigned i = 0; i < head->width; i++) {
             game->cursor.x = cursor_x + (head->position + i) % game->size.x;
-            render_symbol(window, head->symbol, game);
+            render_symbol(window, head->symbol, self->bg_color, game);
         }
         head = head->next;
     }
@@ -78,7 +85,7 @@ void render_border(WINDOW * window, struct Game * game) {
             if (!!(x % width) ^ !!(y % height)) {
                 game->cursor.x = 1 + x;
                 game->cursor.y = 1 + y;
-                render_symbol(window, Border, game);
+                render_symbol(window, Border, Null, game);
             }
         }
     }
@@ -103,6 +110,5 @@ void render_game(struct Game * game) {
 
     game->cursor.x = game->player.x;
     game->cursor.y = game->player.y - scroll;
-    render_symbol(window, Frog, game);
-    attron(COLOR_PAIR(Null));
-}
+    render_symbol(window, Frog, game->strips[game->player.y]->bg_color, game);
+}   

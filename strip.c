@@ -11,6 +11,7 @@ Strip * _create_strip_common(struct Game * game) {
     Strip* self = calloc(1, sizeof(Strip));
     self->render = render_strip;
     self->bg = Null;
+    self->bg_color = Null;
     (void)game;
     return self;
 }
@@ -118,8 +119,8 @@ int add_entity(Strip * self, Entity * entity, struct Game * game) {
 }
 
 Strip * _create_strip_movable(
-    Symbol bg, Entity * fg,
-    size_t n_fg, size_t fg_count,
+    Symbol bg, 
+    Entity * fg, size_t n_fg, size_t fg_count,
     struct Game * game
 ) {
     Strip * self = _create_strip_common(game);
@@ -158,6 +159,7 @@ Strip * create_strip_river(struct Game * game) {
         game->config.LOGS_PER_STRIP,
         game
     );
+    self->bg_color = -1;
     self->collide = lose_game;
     return self;
 }

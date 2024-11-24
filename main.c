@@ -9,6 +9,13 @@
 
 extern void read_player_name(struct Game * game);
 
+int define_new_color(short r, short g, short b) {
+    static int color_count = 0;
+    int index = COLOR_OFFSET - ++color_count;
+    init_color(index, r, g, b);
+    return -color_count;
+}
+
 void handle_key_down(struct Game * game, int keycode) {
     memset(&game->prev_move, 0, sizeof(struct Point));
     if (keycode == 'w') {
@@ -49,17 +56,12 @@ WINDOW * init_curses(const struct Game * game) {
     init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
     #else
     for (int i = 0; i < Symbol_Count; i++) {
-        init_color(i, game->colors[i][0], game->colors[i][1], game->colors[i][2]);
+        int res = DEFINE_COLOR(i, game->colors[i][0], game->colors[i][1], game->colors[i][2]);
+        INFO("%d %d", i, res);
     }
-    assume_default_colors(Curb, Null);
-    init_pair(Null ,  Null , Null);
-    init_pair(Frog ,  Frog , Null);
-    init_pair(Tree ,  Tree , Null);
-    init_pair(Water,  Water, Water );
-    init_pair(Log  ,  Log  , Water );
-    init_pair(Car  ,  Car  , Null);
-    init_pair(Taxi ,  Taxi , Null);
-    init_pair(Curb ,  Curb , Null);
+    const short * bg_color = game->colors[Water];
+    define_new_color(bg_color[0] * .55, bg_color[1]* .55, bg_color[2]* .55);
+
     #endif
     LOG("%#x %#x", COLOR_PAIR(Null), (unsigned)COLOR_BLACK);
 

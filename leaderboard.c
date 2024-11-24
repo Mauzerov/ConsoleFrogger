@@ -81,7 +81,8 @@ void read_player_name(struct Game * game) {
     int posy = (game->config.VISIBLE_STRIPS * CELL_HEIGHT - 5) / 2;
     int posx = (game->size.x * CELL_WIDTH - 28) / 2;
     char name[20] = { 0 };
-    wattron(w, COLOR_PAIR(Null));
+    SET_COLOR_PAIR(Border, Border, Null);
+    SET_TEXTCOLOR(w, Border);
     mvwaddstr (w, posy++, posx, "                            ");
     mvwaddstr (w, posy++, posx, " +======+  Winner  +======+ ");
     mvwaddstr (w, posy++, posx, " |Name:                   | ");

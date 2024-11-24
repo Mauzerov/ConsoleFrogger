@@ -5,6 +5,12 @@
 #error "No support for windows"
 #else
 #include <curses.h>
+
+#define COLOR_OFFSET 69
+#define DEFINE_COLOR(color, r, g, b)      init_color(color + COLOR_OFFSET, r, g, b)
+#define SET_TEXTCOLOR(w, color)           wattron(w, COLOR_PAIR(color + COLOR_OFFSET))
+#define SET_COLOR_PAIR(color, fore, back) init_pair(color + COLOR_OFFSET, fore + COLOR_OFFSET, back + COLOR_OFFSET)
+
 #endif
 
 #define SECONDS 1000
@@ -50,5 +56,7 @@
 
 #define HEX_TO_RGB(hex) \
     (hex & 0xFF0000) >> 16, (hex & 0x00FF00) >> 8, (hex & 0x0000FF)
+
+int define_new_color(short, short, short);
 
 #endif

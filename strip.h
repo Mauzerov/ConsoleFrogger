@@ -17,7 +17,8 @@ struct Game;
 
 struct Strip {
     struct Entity * entities; // Linked List
-    Symbol bg;                // Strip can only have one backgroud (more is unnecessary)
+    Symbol bg, bg_color;      // Strip can only have one backgroud (more is unnecessary)
+    
     void (*update)   (struct Strip *, struct Game *);
     void (*render)   (WINDOW *, struct Strip *, struct Game *);
     void (*collide)  (struct Game *);
