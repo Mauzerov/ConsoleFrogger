@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "engine.h"
 
 #include "strip.h"
@@ -24,6 +26,33 @@ extern void render_leaderboard(struct Game * game);
     if (strcmp(#field, buffer) == 0) {      \
         fscanf(file, "%d", &config->field); \
     }
+
+short hex_char_to_num(char c) {
+    if ('0' <= c && c <= '9')
+        return c - '0';
+    if ('a' <= c && c <= 'f')
+        return c - 'a' + 10;
+    if ('F' <= c && c <= 'F')
+        return c - 'A' + 10;
+    assert(0 && "Invalid Hex Value");
+}
+
+unsigned long hex_str_to_num(const char hex_color[6]) {
+    unsigned long color = 0;
+    for (int i = 0; i < 6; i++) {
+        color = (color << 4) | hex_char_to_num(hex_color[i]);
+    }
+    return color;
+}
+
+void read_colors(struct Game * game, FILE * file) {
+    char hex_color[6] = { 0 };
+    for (int i = 0; i < Symbol_Count; i++) {
+        fscanf(file, "%6s", hex_color);
+        game->colors[i] = hex_str_to_num(hex_color);
+        LOG("Color %d: %6s => %#lx", i, hex_color, game->colors[i]);
+    }
+}
 
 void read_textures(struct Game * game, FILE * file) {
     const int size = CELL_WIDTH * CELL_HEIGHT;
@@ -68,6 +97,9 @@ void read_config_file(struct Game * game) {
         if (strcmp(buffer, "TEXTURES") == 0) {
             read_textures(game, file);
         } else
+        if (strcmp(buffer, "COLORS") == 0) {
+            read_colors(game, file);
+        } else
         read_game_config(file, &game->config, buffer);
     }
     fclose(file);
@@ -95,7 +127,7 @@ void init_strips(struct Game * game) {
         create_strip_forest,
         create_strip_empty
     };
-    size_t STRIP_COUNT = sizeof(StripConstructors) / sizeof(StripConstructors[0]);
+    const size_t STRIP_COUNT = sizeof(StripConstructors) / sizeof(StripConstructors[0]);
 
     int prev_direction = 0;
     for (int i = 0; i < game->size.y; i++) {
