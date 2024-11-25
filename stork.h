@@ -25,9 +25,8 @@ void update_stork(struct Game * game) {
     delta.x = game->player.x - stork_pos->x;
     delta.y = game->player.y - stork_pos->y;
 
-    if (abs(delta.x) < abs(delta.y))
-        stork_pos->y  += sgn(delta.y);
-    else stork_pos->x += sgn(delta.x);
+    stork_pos->y += sgn(delta.y);
+    stork_pos->x += sgn(delta.x);
 
     if (point_overlapping(stork_pos, &game->player)) {
         game->over = LOSS;
