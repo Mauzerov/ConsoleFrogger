@@ -32,6 +32,6 @@ struct Cell {
 
 typedef struct Cell Cell;
 
-void render_symbol(WINDOW *, Symbol, Symbol, struct Game *);
+void render_symbol(WINDOW *, Symbol, Symbol, struct Game *, int);
 
 #endif
