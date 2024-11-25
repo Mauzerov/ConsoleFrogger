@@ -43,7 +43,7 @@ void init_custom_colors(const struct Game * game) {
         COLORS, COLOR_PAIRS,
         COLOR_BLACK, COLOR_WHITE
     );
-    if (!(has_colors() && can_change_color())) {
+    if (!can_change_color()) {
         init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
         init_pair(Frog ,  10          , COLOR_BLACK);
         init_pair(Tree ,  COLOR_GREEN , COLOR_BLACK);
