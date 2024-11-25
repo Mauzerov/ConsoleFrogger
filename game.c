@@ -4,6 +4,7 @@
 
 #include "strip.h"
 #include "game.h"
+#include "stork.h"
 
 unsigned _P(int point, struct Game * game) {
     while (point < 0)
@@ -79,6 +80,8 @@ void read_game_config(FILE * file, struct Config * config, char * buffer) {
     ConfigRead(config, VISIBLE_AHEAD);
     ConfigRead(config, CHANCE_OF_SPEED_CHANGE);
     ConfigRead(config, SEED);
+    ConfigRead(config, STORK_VELOCITY);
+    ConfigRead(config, STORK_X);
 }
 
 void read_config_file(struct Game * game) {
@@ -166,6 +169,7 @@ void init_game(struct Game * game) {
     game->strips = calloc(game->size.y, sizeof(struct Strip *));
 
     init_strips(game);
+    init_stork(game);
 }
 
 /**
@@ -207,6 +211,8 @@ void update_game(struct Game * game) {
     // second call required, so that the fail screen isn't awkward
     if (handle_player_collisions(playerStrip, game) == 0u)
         invoke(playerStrip->collide, game);
+
+    update_stork(game);
 }
 
 /**
@@ -221,5 +227,6 @@ void destroy_game(struct Game * game) {
     for (int i = 0; i < game->size.y; i++) {
         destroy_strip(game->strips[i]);
     }
+    free(game->stork);
     free(game->strips);
 }

@@ -104,11 +104,14 @@ void render_game(struct Game * game) {
         game->cursor.x = 0;
         invoke(
             game->strips[i + scroll]->render,
-            window, game->strips[i + scroll], game
+            window, game->strips[i + scroll], game, 0
         );
+        if (game->stork->pos.y == i + scroll){
+            memcpy(&game->cursor, &game->stork->pos, sizeof(struct Point));
+            render_stork(window, game, scroll);
+        }
     }
 
-    game->cursor.x = game->player.x;
-    game->cursor.y = game->player.y - scroll;
-    render_symbol(window, Frog, game->strips[game->player.y]->bg_color, game);
+    memcpy(&game->cursor, &game->player, sizeof(struct Point));
+    render_symbol(window, Frog, game->strips[game->player.y]->bg_color, game, scroll);
 }   

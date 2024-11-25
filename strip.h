@@ -20,7 +20,7 @@ struct Strip {
     Symbol bg, bg_color;      // Strip can only have one backgroud (more is unnecessary)
     
     void (*update)   (struct Strip *, struct Game *);
-    void (*render)   (WINDOW *, struct Strip *, struct Game *);
+    void (*render)   (WINDOW *, struct Strip *, struct Game *, int);
     void (*collide)  (struct Game *);
     // Movable Strip definition
     int direction;
@@ -32,7 +32,7 @@ typedef struct Strip Strip;
 typedef struct Entity Entity;
 
 
-void render_strip(WINDOW *, Strip *, struct Game *);
+void render_strip(WINDOW *, Strip *, struct Game *, int);
 // void render_cell(Symbol, struct Game *);
 
 Strip * _create_strip_common();

@@ -7,6 +7,9 @@
 #include "strip.h"
 #include "game.h"
 
+#define STORK_IMPLEMENTATION
+#include "stork.h"
+
 extern void read_player_name(struct Game * game);
 
 int define_new_color(short r, short g, short b) {

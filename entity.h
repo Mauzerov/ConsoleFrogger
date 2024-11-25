@@ -7,10 +7,11 @@ struct Entity {
     CellType type;
     // Entity width (number of positions taken up, to the right of .position)
     unsigned width;
-    void (*player_near)(struct Entity *);
     // just a x-axis position (y is obtained from strip)
-    // no need for duplication of data
-    unsigned position;
+    // no need for duplication of data (unless entity can move vertically)
+    struct Point pos;
+    // action to perform when player is near
+    void (*player_near)(struct Entity *);
     
     int state, velocity;
     // NOTE: Entity is a linked list:
@@ -23,6 +24,8 @@ struct Entity {
     // 
     struct Entity * next;
 };
+
+int can_move(struct Entity *);
 
 void undo_move(struct Game *);
 

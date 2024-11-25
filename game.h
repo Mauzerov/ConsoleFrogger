@@ -22,10 +22,6 @@
 #include "strip.h"
 #include "entity.h"
 
-struct Point {
-    int x, y;
-};
-
 struct Player {
     char name[20];
     unsigned long score;
@@ -41,7 +37,9 @@ struct Config {
         SEED,
         VISIBLE_STRIPS,
         VISIBLE_AHEAD,
-        CHANCE_OF_SPEED_CHANGE
+        CHANCE_OF_SPEED_CHANGE,
+        STORK_VELOCITY,
+        STORK_X
     ;
 };
 
@@ -51,6 +49,7 @@ struct Game {
                  prev_move,
                  size,
                  cursor;
+    struct Entity * stork;
     struct Config config;
     WINDOW * window,
            * info_panel;

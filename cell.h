@@ -13,6 +13,7 @@ typedef enum {
     Curb,
     Car,
     Taxi,
+    Stork,
     Symbol_Count
 } Symbol;
 

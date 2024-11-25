@@ -3,6 +3,10 @@
 
 typedef struct Entity Entity;
 
+int can_move(struct Entity * e) {
+    return (e->state = (e->state + 1) % e->velocity) == 0;
+}
+
 void undo_move(struct Game * game) {
     assert(game->player.x || game->player.y);
     // undo prev move

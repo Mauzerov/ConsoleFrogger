@@ -37,7 +37,7 @@ void _update_entity_moveable(
     struct Entity * head,
     int entity_y
 ) {
-    if ((head->state = (head->state + 1) % head->velocity) != 0)
+    if (!can_move(head))
         return;
     if (self->has_random_velocity
         && rand() % 100 < game->config.CHANCE_OF_SPEED_CHANGE) {
@@ -47,14 +47,14 @@ void _update_entity_moveable(
     int player_moved = game->strips[game->player.y] != self;
     // TODO: use _P (possibly rename)
     int player_near = (abs(game->player.y - entity_y) <= 1)
-                    && abs(((int)game->player.x - (int)head->position + game->size.x) % game->size.x) <= 2;
+                    && abs(((int)game->player.x - (int)head->pos.x + game->size.x) % game->size.x) <= 2;
     if (head->player_near == NULL || !player_near) {
         // and move player along if wasn't moved already
         if (!player_moved && is_entity_at(head, game->player.x, game)) {
             moveby(&game->player.x, self->direction, game->size.x);
             player_moved = 1;
         }
-        moveby(&head->position, self->direction, game->size.x);
+        moveby(&head->pos.x, self->direction, game->size.x);
     } else {
         head->player_near(head);
     }
@@ -82,7 +82,7 @@ int is_entity_at(Entity * entity, unsigned index, struct Game * game) {
     // maybe convert it to math (2 conditions)
     // checking if a point is in a range that is periodic is weird
     for (unsigned i = 0; i < entity->width; i++) {
-        if ((entity->position + i) % game->size.x == index)
+        if ((entity->pos.x + i) % game->size.x == index)
             return 1;
     }
     return 0;
@@ -94,7 +94,7 @@ int add_entity_at(
     struct Game * game,
     int position
 ) {
-    entity->position = position != -1 ? position : rand() % game->size.x;
+    entity->pos.x = position != -1 ? position : rand() % game->size.x;
     entity->velocity = self->velocity;
 
     if (self->entities == NULL){

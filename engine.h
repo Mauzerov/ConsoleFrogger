@@ -54,9 +54,16 @@
     (((x - min_in) * (max_out - min_out)) / (max_in - min_in)) + min_out    \
 )
 
+#define sgn(x) clamp(-1, (int)(x), 1)
+
 #define HEX_TO_RGB(hex) \
     (hex & 0xFF0000) >> 16, (hex & 0x00FF00) >> 8, (hex & 0x0000FF)
 
 int define_new_color(short, short, short);
 
+struct Point {
+    int x, y;
+};
+
+#define point_overlapping(a, b) ((a)->x == (b)->x && (a)->y == (b)->y)
 #endif
