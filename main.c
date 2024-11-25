@@ -37,33 +37,26 @@ void handle_key_down(struct Game * game, int keycode) {
     }
 }
 
-WINDOW * init_curses(WINDOW * window, const struct Game * game) {    
+void init_custom_colors(const struct Game * game) {    
     INFO("Colors: %d %d %d %d %d",
         has_colors(),
         COLORS, COLOR_PAIRS,
         COLOR_BLACK, COLOR_WHITE
     );
-    #if 0
-    init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
-    init_pair(Frog ,  10          , COLOR_BLACK);
-    init_pair(Tree ,  COLOR_GREEN , COLOR_BLACK);
-    init_pair(Water,  COLOR_CYAN  , COLOR_BLUE );
-    init_pair(Log  ,  COLOR_YELLOW, COLOR_BLUE );
-    init_pair(Car  ,  COLOR_RED   , COLOR_BLACK);
-    init_pair(Taxi ,  COLOR_YELLOW, COLOR_BLACK);
-    init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
-    #else
-    for (int i = 0; i < Symbol_Count; i++) {
-        int res = DEFINE_COLOR(i, game->colors[i][0], game->colors[i][1], game->colors[i][2]);
-        INFO("%d %d", i, res);
+    if (!(has_colors() && can_change_color())) {
+        init_pair(Null ,  COLOR_WHITE , COLOR_BLACK);
+        init_pair(Frog ,  10          , COLOR_BLACK);
+        init_pair(Tree ,  COLOR_GREEN , COLOR_BLACK);
+        init_pair(Water,  COLOR_CYAN  , COLOR_BLUE );
+        init_pair(Log  ,  COLOR_YELLOW, COLOR_BLUE );
+        init_pair(Car  ,  COLOR_RED   , COLOR_BLACK);
+        init_pair(Taxi ,  COLOR_YELLOW, COLOR_BLACK);
+        init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
+    } else {
+        for (int i = 0; i < Symbol_Count; i++) {
+            DEFINE_COLOR(i, game->colors[i][0], game->colors[i][1], game->colors[i][2]);
+        }
     }
-
-    #endif
-    LOG("%#x %#x", COLOR_PAIR(Null), (unsigned)COLOR_BLACK);
-
-    curs_set(0);
-    noecho();
-    return window;
 }
 
 void init_sub_windows(struct Game * game, WINDOW * main_window) {
@@ -155,12 +148,15 @@ void main_loop(struct Game * game) {
 int main() {
     WINDOW * main_window = initscr();
     start_color();
+    curs_set(0);
+    noecho();
+
     struct Game game = { 0 };
     read_config_file(&game);
     const int seed = game.config.SEED ? game.config.SEED : time(NULL);
     srand(seed);
     init_game(&game);
-    init_curses(main_window, &game);
+    init_custom_colors(&game);
 
     init_sub_windows(&game, main_window);
 
