@@ -39,7 +39,7 @@ void handle_key_down(struct Game * game, int keycode) {
     } else
     if (keycode == ' ') {
         game->willing_to_travel ^= TRUE;
-        fprintf(stderr, "w: %d\n", game->willing_to_travel);
+        INFO("w: %d", game->willing_to_travel);
     }
 }
 
