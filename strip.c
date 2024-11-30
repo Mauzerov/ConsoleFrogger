@@ -31,33 +31,37 @@ int get_strip_index(Strip * self, Strip ** strips) {
  * 
  **/
 
-void _update_entity_moveable(
+int _update_entity_moveable(
     Strip * self,
     struct Game * game,
     struct Entity * head,
-    int entity_y
+    int entity_y,
+    int player_moved
 ) {
     if (!can_move(head))
-        return;
+        return player_moved;
     if (self->has_random_velocity
         && rand() % 100 < game->config.CHANCE_OF_SPEED_CHANGE) {
         head->velocity = 1 + (head->velocity != 2);
     }
 
-    int player_moved = game->strips[game->player.y] != self;
+    int player_strip = game->strips[game->player.y] == self;
     // TODO: use _P (possibly rename)
     int player_near = (abs(game->player.y - entity_y) <= 1)
-                    && abs(((int)game->player.x - (int)head->pos.x + game->size.x) % game->size.x) <= 2;
-    if (head->stop_when_player_near != TRUE || !player_near) {
+        && abs(((int)game->player.x - (int)head->pos.x + game->size.x) % game->size.x) <= 2;
+    int can_travel = game->willing_to_travel || head->symbol == Log;
+    if (!head->stop_when_player_near || !player_near) {
         // and move player along if wasn't moved already
-        if (!player_moved && is_entity_at(head, game->player.x, game)) {
+        if (player_strip && !player_moved && can_travel
+            && is_entity_at(head, game->player.x, game)) {
             moveby(&game->player.x, self->direction, game->size.x);
-            player_moved = 1;
+            player_moved = TRUE;
         }
         moveby(&head->pos.x, self->direction, game->size.x);
     } else {
         player_near_car(head);
     }
+    return player_moved;
 }
 
 void update_strip_moveable(Strip * self, struct Game * game) {
@@ -65,10 +69,11 @@ void update_strip_moveable(Strip * self, struct Game * game) {
             "Movable Strip cannot be static!");
 
     int strip_y = get_strip_index(self, game->strips);
+    int player_moved = FALSE;
     // if strip should be moved; move all its entities
     struct Entity * head = self->entities;
     while (head != NULL) {
-        _update_entity_moveable(self, game, head, strip_y);
+        player_moved |= _update_entity_moveable(self, game, head, strip_y, player_moved);
         head = head->next;
     }
 
