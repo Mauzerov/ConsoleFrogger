@@ -9,7 +9,7 @@
 
 Strip * _create_strip_common(struct Game * game) {
     Strip* self = calloc(1, sizeof(Strip));
-    self->render = render_strip;
+    // self->render = render_strip;
     self->bg = Null;
     self->bg_color = Null;
     (void)game;

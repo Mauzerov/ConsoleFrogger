@@ -110,8 +110,7 @@ void render_game(struct Game * game) {
     for (int i = 0; i < visibility; i++) {
         game->cursor.y = i;
         game->cursor.x = 0;
-        invoke(
-            game->strips[i + scroll]->render,
+        render_strip(
             window, game->strips[i + scroll], game, 0
         );
         if (game->stork->pos.y == i + scroll){
