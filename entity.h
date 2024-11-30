@@ -29,8 +29,6 @@ int can_move(struct Entity *);
 
 void undo_move(struct Game *);
 
-void lose_game(struct Game *);
-
 void end_game(struct Game *, int);
 
 void handle_entity_collision(struct Entity *, struct Game*);

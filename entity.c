@@ -16,10 +16,6 @@ void undo_move(struct Game * game) {
     memset(&game->prev_move, 0, sizeof(struct Point));
 }
 
-void lose_game(struct Game * game) {
-    end_game(game, LOSS);
-}
-
 void end_game(struct Game * game, int reason) {
     game->over = reason;
 }
@@ -33,7 +29,7 @@ void handle_entity_collision(
         undo_move(game);
         break;
     case Evil:
-        lose_game(game);
+        end_game(game, LOSS);
         break;
     default:
         break;
