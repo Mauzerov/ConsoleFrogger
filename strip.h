@@ -18,8 +18,8 @@ struct Game;
 struct Strip {
     struct Entity * entities; // Linked List
     Symbol bg, bg_color;      // Strip can only have one backgroud (more is unnecessary)
+    CellType collide;
     
-    void (*collide)  (struct Game *);
     // Movable Strip definition
     int direction;
     int has_random_velocity, velocity;

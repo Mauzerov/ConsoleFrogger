@@ -202,16 +202,18 @@ void update_game(struct Game * game) {
         return; // if player won no need to check collisions
     }
     
-    if (handle_player_collisions(playerStrip, game) == 0u)
-        invoke(playerStrip->collide, game);
+    if (handle_player_collisions(playerStrip, game) == 0u
+        && playerStrip->collide == Evil)
+        lose_game(game);
 
     for (int i = 0; i < game->size.y; i++) {
         if (game->strips[i]->velocity != 0)
             update_strip_moveable(game->strips[i], game);
     }
     // second call required, so that the fail screen isn't awkward
-    if (handle_player_collisions(playerStrip, game) == 0u)
-        invoke(playerStrip->collide, game);
+    if (handle_player_collisions(playerStrip, game) == 0u
+        && playerStrip->collide == Evil)
+        lose_game(game);
 
     update_stork(game);
 }

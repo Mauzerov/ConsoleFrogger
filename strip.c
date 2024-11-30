@@ -48,7 +48,7 @@ void _update_entity_moveable(
     // TODO: use _P (possibly rename)
     int player_near = (abs(game->player.y - entity_y) <= 1)
                     && abs(((int)game->player.x - (int)head->pos.x + game->size.x) % game->size.x) <= 2;
-    if (head->player_near == NULL || !player_near) {
+    if (head->stop_when_player_near != TRUE || !player_near) {
         // and move player along if wasn't moved already
         if (!player_moved && is_entity_at(head, game->player.x, game)) {
             moveby(&game->player.x, self->direction, game->size.x);
@@ -56,7 +56,7 @@ void _update_entity_moveable(
         }
         moveby(&head->pos.x, self->direction, game->size.x);
     } else {
-        head->player_near(head);
+        player_near_car(head);
     }
 }
 
@@ -164,7 +164,7 @@ Strip * create_strip_river(struct Game * game) {
     } else {
         self->bg_color = COLOR_BLUE;
     }
-    self->collide = lose_game;
+    self->collide = Evil;
     return self;
 }
 
@@ -182,7 +182,7 @@ Strip * create_strip_road(struct Game * game) {
     Entity fg[] = {
         { Car,  .width = 1, .type = Evil },
         { Car,  .width = 1, .type = Evil,
-                .player_near = player_near_car },
+                .stop_when_player_near = TRUE },
         { Taxi, .width = 1 }
     };
     Strip * self = _create_strip_movable(

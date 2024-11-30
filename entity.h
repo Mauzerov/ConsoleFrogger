@@ -11,7 +11,7 @@ struct Entity {
     // no need for duplication of data (unless entity can move vertically)
     struct Point pos;
     // action to perform when player is near
-    void (*player_near)(struct Entity *);
+    int stop_when_player_near;
     
     int state, velocity;
     // NOTE: Entity is a linked list:
