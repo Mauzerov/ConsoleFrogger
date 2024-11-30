@@ -36,7 +36,7 @@ void render_strip(WINDOW *, Strip *, struct Game *, int);
 
 Strip * _create_strip_common();
 
-void _update_strip_moveable(Strip *, struct Game *);
+void update_strip_moveable(Strip *, struct Game *);
 
 int is_entity_at(Entity *, unsigned, struct Game *);
 

@@ -207,8 +207,7 @@ void update_game(struct Game * game) {
 
     for (int i = 0; i < game->size.y; i++) {
         if (game->strips[i]->velocity != 0)
-            _update_entity_moveable(game->strips[i], game);
-        // invoke(game->strips[i]->update, game->strips[i], game);
+            update_strip_moveable(game->strips[i], game);
     }
     // second call required, so that the fail screen isn't awkward
     if (handle_player_collisions(playerStrip, game) == 0u)

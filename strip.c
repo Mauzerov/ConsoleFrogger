@@ -60,7 +60,7 @@ void _update_entity_moveable(
     }
 }
 
-void _update_strip_moveable(Strip * self, struct Game * game) {
+void update_strip_moveable(Strip * self, struct Game * game) {
     assert(self->direction != 0 && self->velocity &&
             "Movable Strip cannot be static!");
     
@@ -127,7 +127,6 @@ Strip * _create_strip_movable(
 
     self->direction = (rand() & 1) ? UPDATE_RIGHT : UPDATE_LEFT;
     self->velocity  = ((rand() % 100) < game->config.CHANCE_OF_SLOW_STRIP) + 1;
-    self->update = _update_strip_moveable;
     self->bg = bg;
 
     for (size_t i = 0; i < fg_count; i++) {
