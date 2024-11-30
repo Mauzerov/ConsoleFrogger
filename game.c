@@ -153,7 +153,7 @@ void init_strips(struct Game * game) {
 }
 
 void init_game(struct Game * game) {
-    game->player_count = read_leaderboard(game->leaderboard);
+    game->leaderboard_count = read_leaderboard(game->leaderboard);
 
     if (game->size.x == 0 || game->size.x > MAX_GAME_WIDTH) {
         WARN("Game size exceeded maximum width %d > %d.", game->size.x, MAX_GAME_WIDTH);

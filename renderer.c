@@ -56,7 +56,7 @@ void render_leaderboard(struct Game * game) {
     mvwaddstr(window, 0, (INFO_PANEL_WIDTH - 12) >> 1, " SCOREBOARD ");
     
     char leaderboard_line[INFO_PANEL_WIDTH * 2] = { 0 };
-    for (int i = 0; i < game->player_count; i++) {
+    for (int i = 0; i < game->leaderboard_count; i++) {
         sprintf(
             leaderboard_line,
             " %1d: %-20s  : %05lu",

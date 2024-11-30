@@ -29,16 +29,16 @@ int read_leaderboard(Player leaderboard[LEADERBOARD_SIZE]) {
     if (file == NULL)
         return 0;
 
-    int player_count = 0;
+    int leaderboard_count = 0;
     while (fscanf(file, "%lu %19[^\n]",
-        &leaderboard[player_count].score,
-        leaderboard [player_count].name
-    ) == 2) player_count++;
+        &leaderboard[leaderboard_count].score,
+        leaderboard [leaderboard_count].name
+    ) == 2) leaderboard_count++;
     fclose(file);
 
-    if (player_count > 1)
-        qsort(leaderboard, player_count, sizeof(Player), order_players);
-    return player_count;
+    if (leaderboard_count > 1)
+        qsort(leaderboard, leaderboard_count, sizeof(Player), order_players);
+    return leaderboard_count;
 }
 
 void add_player_to_leaderboard(
@@ -47,10 +47,10 @@ void add_player_to_leaderboard(
 ) {
     // TODO: to allow continuous play change this to game->leaderboard
     Player leaderboard[LEADERBOARD_SIZE] = { 0 };
-    int i, player_count = read_leaderboard(leaderboard);
+    int i, leaderboard_count = read_leaderboard(leaderboard);
 
     // assume players are sorted from lowest to highest point
-    for (i = 0; i < player_count; i++) {
+    for (i = 0; i < leaderboard_count; i++) {
         if (score < leaderboard[i].score)
             break; // insert player at (i)
     }

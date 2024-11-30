@@ -54,8 +54,9 @@ struct Game {
     WINDOW * window,
            * info_panel;
     Player leaderboard[LEADERBOARD_SIZE];
-    int player_count;
+    int leaderboard_count;
     int over;
+    int willing_to_travel;
     unsigned long score;
     char textures[Symbol_Count][CELL_WIDTH * CELL_HEIGHT];
     short colors[Symbol_Count][3];
