@@ -31,7 +31,6 @@ typedef struct Entity Entity;
 
 
 void render_strip(WINDOW *, Strip *, struct Game *, int);
-// void render_cell(Symbol, struct Game *);
 
 Strip * _create_strip_common(struct Game *);
 

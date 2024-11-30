@@ -86,7 +86,6 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
         (offx - INFO_PANEL_WIDTH) / 2
     );
 
-    // cbreak();
     nodelay(game->window, TRUE);
     keypad(game->window,  TRUE);
 

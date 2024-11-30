@@ -12,7 +12,7 @@ void render_symbol(
 ) {
     SET_COLOR_PAIR(symbol, symbol, background);
     SET_TEXTCOLOR(window, symbol);
-    // wattron(window, COLOR_PAIR(symbol));
+    
     assert(symbol > 0);
     for (int i = 0; i < CELL_HEIGHT; i++) {
         for (int j = 0; j < CELL_WIDTH; j++) {

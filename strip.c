@@ -9,7 +9,7 @@
 
 Strip * _create_strip_common(struct Game * game) {
     Strip* self = calloc(1, sizeof(Strip));
-    // self->render = render_strip;
+
     self->bg = Null;
     self->bg_color = Null;
     (void)game;
@@ -75,14 +75,14 @@ void update_strip_moveable(Strip * self, struct Game * game) {
 }
 
 int is_entity_at(Entity * entity, unsigned index, struct Game * game) {
-    // Todo: Validate this logic
-    // maybe convert it to math (2 conditions)
-    // checking if a point is in a range that is periodic is weird
-    for (unsigned i = 0; i < entity->width; i++) {
-        if ((entity->pos.x + i) % game->size.x == index)
-            return 1;
+    unsigned start = entity->pos.x,
+             end   = (start + entity->width) % game->size.x;
+
+    if (start <= end) {
+        return start <= index && index < end;
     }
-    return 0;
+    // Handle wraparound
+    return start <= index || index < end;
 }
 
 void add_entity_at(
