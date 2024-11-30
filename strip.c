@@ -22,6 +22,12 @@ int get_strip_index(Strip * self, Strip ** strips) {
         return strip_y;
 }
 
+int is_player_near(struct Game * game, struct Entity * head, int entity_y) {
+    return (abs(game->player.y - entity_y) <= 1) &&
+        abs(((int)game->player.x - (int)head->pos.x + game->size.x)
+                                               % game->size.x) <= 2;
+}
+
 /**
  *  MM   MM  OOOOO  VV    VV  AA   BBBBB  LL    EEEEEE
  *  MMM MMM OO   OO  VV  VV  AAAA  B   BB LL    EE   
@@ -31,29 +37,26 @@ int get_strip_index(Strip * self, Strip ** strips) {
  * 
  **/
 
-int _update_entity_moveable(
+int update_entity_moveable(
     Strip * self,
     struct Game * game,
     struct Entity * head,
     int entity_y,
     int player_moved
 ) {
-    if (!can_move(head))
-        return player_moved;
     if (self->has_random_velocity
-        && rand() % 100 < game->config.CHANCE_OF_SPEED_CHANGE) {
-        head->velocity = 1 + (head->velocity != 2);
+        && random_chance(game->config.CHANCE_OF_SPEED_CHANGE)) {
+        head->velocity = 1 + (head->velocity != SLOW_VELOCITY);
     }
 
-    int player_strip = game->strips[game->player.y] == self;
-    // TODO: use _P (possibly rename)
-    int player_near = (abs(game->player.y - entity_y) <= 1)
-        && abs(((int)game->player.x - (int)head->pos.x + game->size.x) % game->size.x) <= 2;
     int can_travel = game->willing_to_travel || head->symbol == Log;
-    if (!head->stop_when_player_near || !player_near) {
+    if (!head->stop_when_player_near || !is_player_near(game, head, entity_y)) {
         // and move player along if wasn't moved already
-        if (player_strip && !player_moved && can_travel
-            && is_entity_at(head, game->player.x, game)) {
+        if (game->player.y == entity_y &&
+            !player_moved &&
+            can_travel    &&
+            is_entity_at(head, game->player.x, game)
+        ) {
             moveby(&game->player.x, self->direction, game->size.x);
             player_moved = TRUE;
         }
@@ -73,7 +76,13 @@ void update_strip_moveable(Strip * self, struct Game * game) {
     // if strip should be moved; move all its entities
     struct Entity * head = self->entities;
     while (head != NULL) {
-        player_moved |= _update_entity_moveable(self, game, head, strip_y, player_moved);
+        if (can_move(head)){
+            player_moved |= update_entity_moveable(
+                self, game,
+                head,
+                strip_y, player_moved
+            );
+        }
         head = head->next;
     }
 
@@ -96,7 +105,7 @@ void add_entity_at(
     struct Game * game,
     int position
 ) {
-    entity->pos.x = position != -1 ? position : rand() % game->size.x;
+    entity->pos.x = (position >= 0) ? position : rand() % game->size.x;
     entity->velocity = self->velocity;
 
     if (self->entities == NULL){
@@ -125,8 +134,8 @@ Strip * _create_strip_movable(
 ) {
     Strip * self = _create_strip_common(game);
 
-    self->direction = (rand() & 1) ? UPDATE_RIGHT : UPDATE_LEFT;
-    self->velocity  = ((rand() % 100) < game->config.CHANCE_OF_SLOW_STRIP) + 1;
+    self->direction = random_chance(50) ? UPDATE_RIGHT : UPDATE_LEFT;
+    self->velocity  = random_chance(game->config.CHANCE_OF_SLOW_STRIP) + 1;
     self->bg = bg;
 
     for (size_t i = 0; i < fg_count; i++) {

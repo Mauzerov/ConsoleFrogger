@@ -65,5 +65,7 @@ struct Point {
     int x, y;
 };
 
+#define random_chance(x) ((rand() % 100) < (x))
+
 #define point_overlapping(a, b) ((a)->x == (b)->x && (a)->y == (b)->y)
 #endif

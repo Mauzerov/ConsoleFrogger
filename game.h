@@ -3,6 +3,7 @@
 
 #define MAX_GAME_WIDTH  25
 #define MAX_GAME_HEIGHT 100
+#define SLOW_VELOCITY 2
 
 #define CELL_WIDTH 3
 #define CELL_HEIGHT 2
