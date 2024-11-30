@@ -204,7 +204,7 @@ void update_game(struct Game * game) {
     
     if (handle_player_collisions(playerStrip, game) == 0u
         && playerStrip->collide == Evil)
-        lose_game(game);
+        end_game(game, LOSS);
 
     for (int i = 0; i < game->size.y; i++) {
         if (game->strips[i]->velocity != 0)
@@ -213,7 +213,7 @@ void update_game(struct Game * game) {
     // second call required, so that the fail screen isn't awkward
     if (handle_player_collisions(playerStrip, game) == 0u
         && playerStrip->collide == Evil)
-        lose_game(game);
+        end_game(game, LOSS);
 
     update_stork(game);
 }

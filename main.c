@@ -15,8 +15,7 @@ extern void read_player_name(struct Game * game);
 int define_new_color(short r, short g, short b) {
     static int color_count = 0;
     int index = COLOR_OFFSET - ++color_count;
-    int err = init_color(index, r, g, b);
-    INFO("new_color: %d rgb(%hd %hd %hd)", err, r, g, b);
+    init_color(index, r, g, b);
     return -color_count;
 }
 
