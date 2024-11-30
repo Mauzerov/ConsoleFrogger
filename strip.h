@@ -19,7 +19,6 @@ struct Strip {
     struct Entity * entities; // Linked List
     Symbol bg, bg_color;      // Strip can only have one backgroud (more is unnecessary)
     
-    void (*update)   (struct Strip *, struct Game *);
     void (*collide)  (struct Game *);
     // Movable Strip definition
     int direction;
