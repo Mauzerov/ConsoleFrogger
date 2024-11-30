@@ -12,34 +12,19 @@
 
 extern void read_player_name(struct Game * game);
 
+/*
+ * IIII NN   N IIII TTTTTT 
+ *  II  NNN  N  II  TTTTTT 
+ *  II  N NN N  II    TT   
+ *  II  N  NNN  II    TT   
+ * IIII N   NN IIII   TT 
+ */
+
 int define_new_color(short r, short g, short b) {
     static int color_count = 0;
     int index = COLOR_OFFSET - ++color_count;
     init_color(index, r, g, b);
     return -color_count;
-}
-
-void handle_key_down(struct Game * game, int keycode) {
-    memset(&game->prev_move, 0, sizeof(struct Point));
-    if (keycode == 'w') {
-        game->player.y +=
-            game->prev_move.y = -(game->player.y > 0);
-    } else
-    if (keycode == 's') {
-        game->player.y +=
-            game->prev_move.y = +(game->player.y + 1 < game->size.y);
-    } else
-    if (keycode == 'd') {
-        game->player.x +=
-            game->prev_move.x = +(game->player.x + 1 < game->size.x);
-    } else
-    if (keycode == 'a') {
-        game->player.x +=
-            game->prev_move.x = -(game->player.x > 0);
-    } else
-    if (keycode == ' ') {
-        game->willing_to_travel ^= TRUE;
-    }
 }
 
 void init_custom_colors(const struct Game * game) {    
@@ -97,7 +82,36 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
     wrefresh(game_border);
     wrefresh(game->info_panel);
 }
+/*
+ * MM   MM   AA   IIII NN   N LL     OOOOO   OOOOO  PPPPP  
+ * MMM MMM  AAAA   II  NNN  N LL    OO   OO OO   OO PP  PP 
+ * M MMM M  A  A   II  N NN N LL    OO   OO OO   OO PPPPP  
+ * M  M  M AAAAAA  II  N  NNN LL    OO   OO OO   OO PP     
+ * M     M AA  AA IIII N   NN LLLLL  OOOOO   OOOOO  PP     
+ */
 
+void handle_key_down(struct Game * game, int keycode) {
+    memset(&game->prev_move, 0, sizeof(struct Point));
+    if (keycode == 'w') {
+        game->player.y +=
+            game->prev_move.y = -(game->player.y > 0);
+    } else
+    if (keycode == 's') {
+        game->player.y +=
+            game->prev_move.y = +(game->player.y + 1 < game->size.y);
+    } else
+    if (keycode == 'd') {
+        game->player.x +=
+            game->prev_move.x = +(game->player.x + 1 < game->size.x);
+    } else
+    if (keycode == 'a') {
+        game->player.x +=
+            game->prev_move.x = -(game->player.x > 0);
+    } else
+    if (keycode == ' ') {
+        game->willing_to_travel ^= TRUE;
+    }
+}
 
 void calculate_time_difference(
     struct timespec       * end,
