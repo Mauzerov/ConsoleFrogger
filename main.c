@@ -21,6 +21,7 @@ int define_new_color(short r, short g, short b) {
 
 void handle_key_down(struct Game * game, int keycode) {
     memset(&game->prev_move, 0, sizeof(struct Point));
+    game->willing_to_travel = FALSE;
     if (keycode == 'w') {
         game->player.y +=
             game->prev_move.y = -(game->player.y > 0);
@@ -36,6 +37,9 @@ void handle_key_down(struct Game * game, int keycode) {
     if (keycode == 'a') {
         game->player.x +=
             game->prev_move.x = -(game->player.x > 0);
+    } else
+    if (keycode == ' ') {
+        game->willing_to_travel = TRUE;
     }
 }
 
