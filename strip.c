@@ -63,9 +63,6 @@ void _update_entity_moveable(
 void update_strip_moveable(Strip * self, struct Game * game) {
     assert(self->direction != 0 && self->velocity &&
             "Movable Strip cannot be static!");
-    
-    // if ((self->state = (self->state + 1) % self->velocity) != 0)
-    //     return;
 
     int strip_y = get_strip_index(self, game->strips);
     // if strip should be moved; move all its entities
@@ -88,7 +85,7 @@ int is_entity_at(Entity * entity, unsigned index, struct Game * game) {
     return 0;
 }
 
-int add_entity_at(
+void add_entity_at(
     Strip * self,
     Entity * entity,
     struct Game * game,
@@ -100,7 +97,7 @@ int add_entity_at(
     if (self->entities == NULL){
         self->entities = calloc(1, sizeof(Entity));
         memcpy(self->entities, entity, sizeof(Entity));
-        return 1;
+        return;
     }
 
     Entity * head = self->entities;
@@ -109,13 +106,11 @@ int add_entity_at(
     }
     head->next = malloc(sizeof(Entity));
     memcpy(head->next, entity, sizeof(Entity));
-    
-    return 1;
 }
 
 
-int add_entity(Strip * self, Entity * entity, struct Game * game) {
-    return add_entity_at(self, entity, game, -1);
+void add_entity(Strip * self, Entity * entity, struct Game * game) {
+    add_entity_at(self, entity, game, -1);
 }
 
 Strip * _create_strip_movable(

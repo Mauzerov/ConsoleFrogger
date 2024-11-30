@@ -1,8 +1,6 @@
 #include "game.h"
 #include "entity.h"
 
-typedef struct Entity Entity;
-
 int can_move(struct Entity * e) {
     return (e->state = (e->state + 1) % e->velocity) == 0;
 }
