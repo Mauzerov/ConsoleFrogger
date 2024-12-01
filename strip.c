@@ -20,6 +20,7 @@ int get_strip_index(Strip * self, Strip ** strips) {
     int strip_y = 0;
     while (strips[strip_y] != self) strip_y++;
         return strip_y;
+    assert(0 && "unreachable");
 }
 
 int is_player_near(struct Game * game, struct Entity * head, int entity_y) {

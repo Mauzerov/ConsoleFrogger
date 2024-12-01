@@ -8,7 +8,7 @@
 
 #define COLOR_OFFSET 69
 #define DEFINE_COLOR(color, r, g, b)      init_color(color + COLOR_OFFSET, r, g, b)
-#define SET_TEXTCOLOR(w, color)           wattron(w, COLOR_PAIR(color + COLOR_OFFSET))
+#define SET_TEXTCOLOR(w, color)           wattron(w, COLOR_PAIR(color + COLOR_OFFSET * can_change_color()))
 #define SET_COLOR_PAIR(color, fore, back) init_pair(color + COLOR_OFFSET, fore + COLOR_OFFSET, back + COLOR_OFFSET)
 
 #endif

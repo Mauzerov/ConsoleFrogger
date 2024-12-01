@@ -129,6 +129,17 @@ void calculate_time_difference(
     }
 }
 
+void handle_frame(struct Game * game, int key) {
+    render_game(game);
+    render_game_state(game);
+    
+    wrefresh(game->info_panel);
+    wrefresh(wgetparent(game->window));
+
+    handle_key_down(game, key);
+    update_game(game);
+}
+
 void main_loop(struct Game * game) {
     int key = ERR;
     struct timespec start, end;
@@ -144,15 +155,8 @@ void main_loop(struct Game * game) {
         if (_key != ERR)
             key = _key;
 
-        if (end.tv_nsec > game->config.TIMEOUT * MICRO_SECONDS) {
-            render_game(game);
-            render_game_state(game);
-            
-            wrefresh(game->info_panel);
-            wrefresh(wgetparent(game->window));
-
-            handle_key_down(game, key);
-            update_game(game);
+        if (end.tv_sec > 0 || end.tv_nsec > game->config.TIMEOUT * MICRO_SECONDS) {
+            handle_frame(game, key);
 
             clock_gettime(CLOCK_REALTIME, &start);
             key = ERR;
