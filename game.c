@@ -28,24 +28,6 @@ extern void render_leaderboard(struct Game * game);
         fscanf(file, "%d", &config->field); \
     }
 
-short hex_char_to_num(char c) {
-    if ('0' <= c && c <= '9')
-        return c - '0';
-    if ('a' <= c && c <= 'f')
-        return c - 'a' + 10;
-    if ('A' <= c && c <= 'F')
-        return c - 'A' + 10;
-    assert(0 && "Invalid Hex Value");
-}
-
-unsigned long hex_str_to_num(const char hex_color[6]) {
-    unsigned long color = 0;
-    for (int i = 0; i < 6; i++) {
-        color = (color << 4) | hex_char_to_num(hex_color[i]);
-    }
-    return color;
-}
-
 void read_colors(struct Game * game, FILE * file) {
     for (int i = 0; i < Symbol_Count; i++) {
         short r, g, b;

@@ -33,6 +33,10 @@ void render_stork(WINDOW * window, struct Game * game, int y_off) {
     render_symbol(window, Stork, bg, game, y_off);
 }
 
+void render_player(WINDOW * window, struct Game * game, int y_off) {
+    render_symbol(window, Frog, game->strips[game->player.y]->bg_color, game, y_off);
+}
+
 void render_strip(WINDOW * window, Strip * self, struct Game * game, int y_off) {
     int cursor_x = game->cursor.x;
     for (int i = 0; i < game->size.x; i++) {
@@ -120,5 +124,5 @@ void render_game(struct Game * game) {
     }
 
     memcpy(&game->cursor, &game->player, sizeof(struct Point));
-    render_symbol(window, Frog, game->strips[game->player.y]->bg_color, game, scroll);
+    render_player(window, game, scroll);
 }   
