@@ -61,6 +61,7 @@ void read_game_config(FILE * file, struct Config * config, char * buffer) {
     ConfigRead(config, VISIBLE_STRIPS);
     ConfigRead(config, VISIBLE_AHEAD);
     ConfigRead(config, CHANCE_OF_SPEED_CHANGE);
+    ConfigRead(config, CHANCE_OF_CAR_DEATH);
     ConfigRead(config, SEED);
     ConfigRead(config, STORK_VELOCITY);
     ConfigRead(config, STORK_X);

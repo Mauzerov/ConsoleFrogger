@@ -40,6 +40,7 @@ struct Config {
         VISIBLE_STRIPS,
         VISIBLE_AHEAD,
         CHANCE_OF_SPEED_CHANGE,
+        CHANCE_OF_CAR_DEATH,
         STORK_VELOCITY,
         STORK_X
     ;

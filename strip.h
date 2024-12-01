@@ -23,7 +23,7 @@ struct Strip {
     // Movable Strip definition
     int direction;
     int has_random_velocity, velocity;
-    int entity_count;
+    struct Entity * entity_in_gulag;
 };
 
 typedef struct Strip Strip;

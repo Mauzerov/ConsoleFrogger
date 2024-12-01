@@ -28,7 +28,6 @@ int is_player_near(struct Game * game, struct Entity * head, int entity_y) {
         abs(((int)game->player.x - (int)head->pos.x + game->size.x)
                                                % game->size.x) <= 2;
 }
-
 /**
  *  MM   MM  OOOOO  VV    VV  AA   BBBBB  LL    EEEEEE
  *  MMM MMM OO   OO  VV  VV  AAAA  B   BB LL    EE   
@@ -68,6 +67,56 @@ int update_entity_moveable(
     return player_moved;
 }
 
+unsigned get_entity_tail_position(
+    Strip * self,
+    struct Entity * entity,
+    struct Game * game
+) {
+    if (self->direction < 0)
+        return (entity->pos.x + entity->width) % game->size.x;
+    return entity->pos.x;
+}
+
+void try_readd_car(
+    Strip * self,
+    struct Game * game
+){
+    if (!self->entity_in_gulag)
+        return;
+    if (!random_chance(game->config.CHANCE_OF_CAR_DEATH)) 
+        return;
+    self->entity_in_gulag->next = NULL;
+    add_entity_at(self, self->entity_in_gulag, game, 0);
+    self->entity_in_gulag = NULL;
+}
+
+void try_remove_car(
+    Strip * self,
+    struct Entity * entity,
+    struct Game * game
+){
+    if (self->entity_in_gulag)
+        return;
+    if (get_entity_tail_position(self, entity, game) != 0u)
+        return;
+    if (!random_chance(game->config.CHANCE_OF_CAR_DEATH)) 
+        return;
+
+    assert(entity != NULL);
+    self->entity_in_gulag = entity;
+
+    struct Entity * head = self->entities;
+    if (self->entities == entity)
+        self->entities = entity->next;
+    else while (head != NULL) {
+        if (head->next == entity) {
+            head->next = entity->next;
+            break;
+        }
+        head = head->next;
+    }
+}
+
 void update_strip_moveable(Strip * self, struct Game * game) {
     assert(self->direction != 0 && self->velocity &&
             "Movable Strip cannot be static!");
@@ -83,6 +132,10 @@ void update_strip_moveable(Strip * self, struct Game * game) {
                 head,
                 strip_y, player_moved
             );
+            if (head->symbol != Log){
+                try_remove_car(self, head, game);
+                try_readd_car(self,  game);
+            }
         }
         head = head->next;
     }
@@ -143,7 +196,7 @@ Strip * _create_strip_movable(
         Entity entity = fg[rand() % n_fg];
         add_entity(self, &entity, game);
     }
-    self->entity_count = fg_count;
+    self->entity_in_gulag = FALSE;
     return self;
 }
 
