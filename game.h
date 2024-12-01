@@ -4,6 +4,7 @@
 #define MAX_GAME_WIDTH  25
 #define MAX_GAME_HEIGHT 100
 #define SLOW_VELOCITY 2
+#define LEVEL_COUNT 3
 
 #define CELL_WIDTH 3
 #define CELL_HEIGHT 2
@@ -56,7 +57,7 @@ struct Game {
            * info_panel;
     Player leaderboard[LEADERBOARD_SIZE];
     int leaderboard_count;
-    int over;
+    int over, level;
     int willing_to_travel;
     unsigned long score;
     char textures[Symbol_Count][CELL_WIDTH * CELL_HEIGHT];

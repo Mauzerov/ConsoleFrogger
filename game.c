@@ -147,7 +147,6 @@ void init_game(struct Game * game) {
     }
 
     game->player.y = game->size.y - 1;
-
     game->strips = calloc(game->size.y, sizeof(struct Strip *));
 
     init_strips(game);

@@ -157,7 +157,13 @@ void main_loop(struct Game * game) {
             clock_gettime(CLOCK_REALTIME, &start);
             key = ERR;
         }
-    } while (!game->over);
+        if (game->over == WIN) {
+            game->level--;
+            destroy_game(game);
+            init_game(game);
+            game->over = 0;
+        }
+    } while (game->level && game->over != LOSS);
 
     render_game(game);
     render_game_state(game);
@@ -174,6 +180,7 @@ int main() {
     const int seed = game.config.SEED ? game.config.SEED : time(NULL);
     srand(seed);
     init_game(&game);
+    game.level = LEVEL_COUNT;
     init_custom_colors(&game);
 
     init_sub_windows(&game, main_window);

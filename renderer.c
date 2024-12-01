@@ -75,7 +75,12 @@ void render_game_state(struct Game * game) {
     
     char buffer[MAX_GAME_WIDTH * CELL_WIDTH] = { 0 };
 
-    int lenght = sprintf(buffer, " Score: %05lu ", game->score);
+    int lenght = sprintf(
+        buffer,
+        " Level %d | Score: %05lu ",
+        LEVEL_COUNT - game->level + 1,
+        game->score
+    );
     mvwaddstr(window,
         0, ((game->size.x * CELL_WIDTH - lenght + 2) >> 1),
         buffer
