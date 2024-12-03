@@ -169,6 +169,7 @@ void main_loop(struct Game * game) {
         }
     } while (game->level && game->over != LOSS);
 
+    if (game->level == 0) game->over = WIN;
     render_game(game);
     render_game_state(game);
 }
