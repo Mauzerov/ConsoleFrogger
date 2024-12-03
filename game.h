@@ -4,7 +4,6 @@
 #define MAX_GAME_WIDTH  25
 #define MAX_GAME_HEIGHT 100
 #define SLOW_VELOCITY 2
-#define LEVEL_COUNT 3
 
 #define CELL_WIDTH 3
 #define CELL_HEIGHT 2
@@ -37,6 +36,7 @@ struct Config {
         CHANCE_OF_SLOW_STRIP,
         TIMEOUT,
         SEED,
+        LEVEL_COUNT,
         VISIBLE_STRIPS,
         VISIBLE_AHEAD,
         CHANCE_OF_SPEED_CHANGE,

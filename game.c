@@ -12,6 +12,7 @@ unsigned _P(int point, struct Game * game) {
     return point % game->size.x;
 }
 
+
 extern int read_leaderboard(Player[LEADERBOARD_SIZE]);
 extern void render_leaderboard(struct Game * game);
 
@@ -63,6 +64,7 @@ void read_game_config(FILE * file, struct Config * config, char * buffer) {
     ConfigRead(config, CHANCE_OF_SPEED_CHANGE);
     ConfigRead(config, CHANCE_OF_CAR_DEATH);
     ConfigRead(config, SEED);
+    ConfigRead(config, LEVEL_COUNT);
     ConfigRead(config, STORK_VELOCITY);
     ConfigRead(config, STORK_X);
 }

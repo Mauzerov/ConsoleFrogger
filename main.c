@@ -185,7 +185,7 @@ int main() {
     const int seed = game.config.SEED ? game.config.SEED : time(NULL);
     srand(seed);
     init_game(&game);
-    game.level = LEVEL_COUNT;
+    game.level = game.config.LEVEL_COUNT;
     init_custom_colors(&game);
 
     init_sub_windows(&game, main_window);

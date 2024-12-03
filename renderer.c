@@ -78,7 +78,7 @@ void render_game_state(struct Game * game) {
     int lenght = sprintf(
         buffer,
         " Level %d | Score: %05lu ",
-        LEVEL_COUNT - game->level + 1,
+        game->config.LEVEL_COUNT - game->level + 1,
         game->score
     );
     mvwaddstr(window,
