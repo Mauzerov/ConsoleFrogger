@@ -93,4 +93,8 @@ void update_game(struct Game *);
 
 void destroy_game(struct Game *);
 
+int empty_message_box(WINDOW *, int, int);
+
+void confirm(WINDOW *, const char *, int);
+
 #endif

@@ -130,4 +130,28 @@ void render_game(struct Game * game) {
 
     memcpy(&game->cursor, &game->player, sizeof(struct Point));
     render_player(window, game, scroll);
-}   
+}
+
+int empty_message_box(WINDOW * w, int posy, int posx) {
+    mvwaddstr (w, posy++, posx, "                            ");
+    mvwaddstr (w, posy++, posx, " +========================+ ");
+    mvwaddstr (w, posy++, posx, " |                        | ");
+    mvwaddstr (w, posy++, posx, " +========================+ ");
+    mvwaddstr (w, posy++, posx, "                            ");
+    return posy;
+}
+
+void confirm(WINDOW * w, const char * message, int key) {
+    int width, height;
+    getmaxyx(w, height, width);
+    int posy = (height - TEXT_BOX_HEIGHT) / 2;
+    int posx = (width - TEXT_BOX_WIDTH) / 2;
+
+    keypad(w,  FALSE);
+    nodelay(w, FALSE);
+    posy = empty_message_box(w, posy, posx);
+    mvwaddstr (w, height / 2 - 1, posx + 2, message);
+    while (wgetch(w) != key) ;
+    keypad(w,  TRUE);
+    nodelay(w, TRUE);
+}

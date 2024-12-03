@@ -157,12 +157,15 @@ void main_loop(struct Game * game) {
 
         if (end.tv_sec > 0 || end.tv_nsec > game->config.TIMEOUT * MICRO_SECONDS) {
             handle_frame(game, key);
-
             clock_gettime(CLOCK_REALTIME, &start);
             key = ERR;
         }
+
         if (game->over == WIN) {
             game->level--;
+            render_game(game);
+
+            confirm(game->window, "Press ENTER to continue!", 10);
             destroy_game(game);
             init_game(game);
             game->over = 0;
@@ -170,7 +173,7 @@ void main_loop(struct Game * game) {
     } while (game->level && game->over != LOSS);
 
     if (game->level == 0) game->over = WIN;
-    render_game(game);
+    
     render_game_state(game);
 }
 

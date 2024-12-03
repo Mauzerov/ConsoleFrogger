@@ -72,23 +72,25 @@ void add_player_to_leaderboard(
 
 void read_player_name(struct Game * game) {
     WINDOW * w = game->window;
-    echo();
     curs_set(1);
+    echo();
 
     keypad(w,  FALSE);
     nodelay(w, FALSE);
 
-    int posy = (game->config.VISIBLE_STRIPS * CELL_HEIGHT - 5) / 2;
-    int posx = (game->size.x * CELL_WIDTH - 28) / 2;
-    char name[20] = { 0 };
+    int posy, posx;
+    getmaxyx(w, posy, posx);
+    posy = (posy - TEXT_BOX_HEIGHT) / 2;
+    posx = (posx - TEXT_BOX_WIDTH)  / 2;
+    char name[MAX_NAME_SIZE] = { 0 };
     SET_COLOR_PAIR(Border, Border, Null);
     SET_TEXTCOLOR(w, Border);
-    mvwaddstr (w, posy++, posx, "                            ");
-    mvwaddstr (w, posy++, posx, " +======+  Winner  +======+ ");
-    mvwaddstr (w, posy++, posx, " |Name:                   | ");
-    mvwaddstr (w, posy++, posx, " +========================+ ");
-    mvwaddstr (w, posy++, posx, "                            ");
-    mvwgetnstr(w, posy-3, posx + 7, name, 19);
+    int center = empty_message_box(w, posy, posx)
+               - TEXT_BOX_HEIGHT / 2 - 1;
+    
+    mvwaddstr (w, center-1, posx + 8, "+  Winner  +");
+    mvwaddstr (w, center,   posx + 2, "Name:");
+    mvwgetnstr(w, center,   posx + 7, name, MAX_NAME_SIZE - 1);
 
     if (strlen(name) > 0) {
         add_player_to_leaderboard(name, game->score);
