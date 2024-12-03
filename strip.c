@@ -87,6 +87,7 @@ void try_readd_car(
         return;
     self->entity_in_gulag->next = NULL;
     add_entity_at(self, self->entity_in_gulag, game, 0);
+    free(self->entity_in_gulag);
     self->entity_in_gulag = NULL;
 }
 
@@ -300,6 +301,8 @@ void destroy_linked_list(struct Entity * entity) {
 
 void destroy_strip(Strip * self) {
     destroy_linked_list(self->entities);
+    if (self->entity_in_gulag)
+        free(self->entity_in_gulag);
     free(self);
 }
 
