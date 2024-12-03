@@ -11,8 +11,12 @@
 #define WIN 2
 #define LOSS 1
 
+#define MAX_NAME_SIZE 20
 #define LEADERBOARD_FILENAME "frogger.score"
 #define LEADERBOARD_SIZE 5
+
+#define TEXT_BOX_WIDTH 28
+#define TEXT_BOX_HEIGHT 5
 
 #define INFO_PANEL_WIDTH  38
 #define INFO_PANEL_HEIGHT (LEADERBOARD_SIZE + 2)
@@ -24,7 +28,7 @@
 #include "entity.h"
 
 struct Player {
-    char name[20];
+    char name[MAX_NAME_SIZE];
     unsigned long score;
 };
 typedef struct Player Player;
