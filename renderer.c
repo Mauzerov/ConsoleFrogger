@@ -77,9 +77,10 @@ void render_game_state(struct Game * game) {
 
     int lenght = sprintf(
         buffer,
-        " Level %d | Score: %05lu ",
+        " Level %d | Score: %05lu | %s ",
         game->config.LEVEL_COUNT - game->level + 1,
-        game->score
+        game->score,
+        game->willing_to_travel ? "Waiting" : " Moving"
     );
     mvwaddstr(window,
         0, ((game->size.x * CELL_WIDTH - lenght + 2) >> 1),
@@ -133,6 +134,9 @@ void render_game(struct Game * game) {
 }
 
 int empty_message_box(WINDOW * w, int posy, int posx) {
+    SET_COLOR_PAIR(Border, Border, Null);
+    SET_TEXTCOLOR(w, Border);
+
     mvwaddstr (w, posy++, posx, "                            ");
     mvwaddstr (w, posy++, posx, " +========================+ ");
     mvwaddstr (w, posy++, posx, " |                        | ");

@@ -83,8 +83,7 @@ void read_player_name(struct Game * game) {
     posy = (posy - TEXT_BOX_HEIGHT) / 2;
     posx = (posx - TEXT_BOX_WIDTH)  / 2;
     char name[MAX_NAME_SIZE] = { 0 };
-    SET_COLOR_PAIR(Border, Border, Null);
-    SET_TEXTCOLOR(w, Border);
+    
     int center = empty_message_box(w, posy, posx)
                - TEXT_BOX_HEIGHT / 2 - 1;
     
