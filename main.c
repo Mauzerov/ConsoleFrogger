@@ -82,6 +82,26 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
     wrefresh(game_border);
     wrefresh(game->info_panel);
 }
+
+WINDOW * initialize(struct Game * game) {
+    WINDOW * main_window = initscr();
+    start_color();
+    curs_set(0);
+    noecho();
+
+    
+    read_config_file(game);
+    const int seed = game->config.SEED ? game->config.SEED : time(NULL);
+    srand(seed);
+    init_game(game);
+
+    game->level = game->config.LEVEL_COUNT;
+    init_custom_colors(game);
+
+    init_sub_windows(game, main_window);
+
+    return main_window;
+}
 /*
  * MM   MM   AA   IIII NN   N LL     OOOOO   OOOOO  PPPPP  
  * MMM MMM  AAAA   II  NNN  N LL    OO   OO OO   OO PP  PP 
@@ -140,6 +160,21 @@ void handle_frame(struct Game * game, int key) {
     update_game(game);
 }
 
+void handle_level_victory(struct Game * game) {
+    game->level--;
+    render_game(game);
+
+    confirm(game->window, "Press ENTER to continue!", 10);
+    destroy_game(game);
+    init_game(game);
+    game->over = 0;
+}
+
+int time_passed(const struct timespec * time, unsigned long long it) {
+    lldiv_t dt = lldiv(it, SECONDS * MICRO_SECONDS);
+    return time->tv_sec >= dt.quot && time->tv_nsec >= dt.rem;
+}
+
 void main_loop(struct Game * game) {
     int key = ERR;
     struct timespec start, end;
@@ -154,21 +189,14 @@ void main_loop(struct Game * game) {
         int _key = wgetch(game->window);
         if (_key != ERR)
             key = _key;
-
-        if (end.tv_sec > 0 || end.tv_nsec > game->config.TIMEOUT * MICRO_SECONDS) {
+        if (time_passed(&end, game->config.TIMEOUT * MICRO_SECONDS)) {
             handle_frame(game, key);
             clock_gettime(CLOCK_REALTIME, &start);
             key = ERR;
         }
 
         if (game->over == WIN) {
-            game->level--;
-            render_game(game);
-
-            confirm(game->window, "Press ENTER to continue!", 10);
-            destroy_game(game);
-            init_game(game);
-            game->over = 0;
+            handle_level_victory(game);
         }
     } while (game->level && game->over != LOSS);
 
@@ -178,20 +206,8 @@ void main_loop(struct Game * game) {
 }
 
 int main() {
-    WINDOW * main_window = initscr();
-    start_color();
-    curs_set(0);
-    noecho();
-
     struct Game game = { 0 };
-    read_config_file(&game);
-    const int seed = game.config.SEED ? game.config.SEED : time(NULL);
-    srand(seed);
-    init_game(&game);
-    game.level = game.config.LEVEL_COUNT;
-    init_custom_colors(&game);
-
-    init_sub_windows(&game, main_window);
+    initialize(&game);
 
     main_loop(&game);
 
