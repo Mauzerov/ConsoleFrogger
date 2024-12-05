@@ -54,7 +54,7 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
     getmaxyx(stdscr, offy, offx);
     (void)offy;
 
-    WINDOW * game_border = subwin(
+    WINDOW * game_border = derwin(
         main_window,
         game->config.VISIBLE_STRIPS * CELL_HEIGHT + 2,
         game->size.x * CELL_WIDTH + 2,
@@ -88,7 +88,6 @@ WINDOW * initialize(struct Game * game) {
     start_color();
     curs_set(0);
     noecho();
-
     
     read_config_file(game);
     const int seed = game->config.SEED ? game->config.SEED : time(NULL);
