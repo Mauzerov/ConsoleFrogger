@@ -3,7 +3,6 @@
 
 #define MAX_GAME_WIDTH  25
 #define MAX_GAME_HEIGHT 100
-#define SLOW_VELOCITY 2
 
 #define CELL_WIDTH 3
 #define CELL_HEIGHT 2
@@ -38,6 +37,8 @@ struct Config {
         LOGS_PER_STRIP,
         TREES_PER_STRIP,
         CHANCE_OF_SLOW_STRIP,
+        SLOW_VELOCITY,
+        NORMAL_VELOCITY,
         TIMEOUT,
         SEED,
         LEVEL_COUNT,

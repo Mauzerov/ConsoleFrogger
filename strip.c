@@ -40,6 +40,12 @@ int is_player_near(struct Game * game, struct Entity * head, int entity_y) {
  *  M     M  OOOOO     VV   AA  AA BBBBB  LLLLL EEEEEE
  * 
  **/
+void change_random_velocity(struct Game * game, struct Entity * head) {
+    if (random_chance(game->config.CHANCE_OF_SPEED_CHANGE)) {
+        head->velocity = (head->velocity == game->config.SLOW_VELOCITY)
+                       ? game->config.NORMAL_VELOCITY : game->config.SLOW_VELOCITY;
+    }
+}
 
 int update_entity_moveable(
     Strip * self,
@@ -48,10 +54,8 @@ int update_entity_moveable(
     int entity_y,
     int player_moved
 ) {
-    if (self->has_random_velocity
-        && random_chance(game->config.CHANCE_OF_SPEED_CHANGE)) {
-        head->velocity = 1 + (head->velocity != SLOW_VELOCITY);
-    }
+    if (self->has_random_velocity)
+        change_random_velocity(game, head);
 
     int can_travel = game->willing_to_travel || head->symbol == Log;
     if (!head->stop_when_player_near || !is_player_near(game, head, entity_y)) {
@@ -194,7 +198,8 @@ Strip * _create_strip_movable(
     Strip * self = _create_strip_common(game);
 
     self->direction = random_chance(50) ? UPDATE_RIGHT : UPDATE_LEFT;
-    self->velocity  = random_chance(game->config.CHANCE_OF_SLOW_STRIP) + 1;
+    self->velocity  = random_chance(game->config.CHANCE_OF_SLOW_STRIP)
+                    ? game->config.SLOW_VELOCITY : game->config.NORMAL_VELOCITY;
     self->bg = bg;
 
     for (size_t i = 0; i < fg_count; i++) {

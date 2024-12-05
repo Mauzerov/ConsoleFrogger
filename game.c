@@ -58,6 +58,8 @@ void read_game_config(FILE * file, struct Config * config, char * buffer) {
     ConfigRead(config, LOGS_PER_STRIP);
     ConfigRead(config, TREES_PER_STRIP);
     ConfigRead(config, CHANCE_OF_SLOW_STRIP);
+    ConfigRead(config, SLOW_VELOCITY);
+    ConfigRead(config, NORMAL_VELOCITY);
     ConfigRead(config, TIMEOUT);
     ConfigRead(config, VISIBLE_STRIPS);
     ConfigRead(config, VISIBLE_AHEAD);
