@@ -2,7 +2,8 @@
 #include "entity.h"
 
 int can_move(struct Entity * e) {
-    return (e->state = (e->state + 1) % e->velocity) == 0;
+    e->state = (e->state + 1) % e->velocity;
+    return e->state == 0;
 }
 
 void undo_move(struct Game * game) {
