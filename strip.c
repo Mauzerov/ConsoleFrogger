@@ -88,7 +88,7 @@ unsigned get_entity_tail_position(
 void try_readd_car(
     Strip * self,
     struct Game * game
-){
+) {
     if (!self->entity_in_gulag)
         return;
     if (!random_chance(game->config.CHANCE_OF_CAR_DEATH)) 
@@ -103,7 +103,7 @@ void try_remove_car(
     Strip * self,
     struct Entity * entity,
     struct Game * game
-){
+) {
     if (self->entity_in_gulag)
         return;
     if (get_entity_tail_position(self, entity, game) != 0u)
@@ -125,6 +125,7 @@ void try_remove_car(
         head = head->next;
     }
 }
+
 
 void update_strip_moveable(Strip * self, struct Game * game) {
     assert(self->direction != 0 && self->velocity &&
@@ -148,8 +149,15 @@ void update_strip_moveable(Strip * self, struct Game * game) {
         }
         head = head->next;
     }
-
 }
+
+/*
+ * IIII NN   N IIII TTTTTT 
+ *  II  NNN  N  II  TTTTTT 
+ *  II  N NN N  II    TT   
+ *  II  N  NNN  II    TT   
+ * IIII N   NN IIII   TT 
+ */
 
 int is_entity_at(Entity * entity, unsigned index, struct Game * game) {
     unsigned start = entity->pos.x,

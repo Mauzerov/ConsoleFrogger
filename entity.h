@@ -1,7 +1,6 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-// NOTE: Entity should overload most (if not all) of Cell
 struct Entity {
     Symbol symbol;
     CellType type;

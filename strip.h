@@ -34,6 +34,20 @@ void render_strip(WINDOW *, Strip *, struct Game *, int);
 
 Strip * _create_strip_common(struct Game *);
 
+int get_strip_index(Strip *, Strip **);
+
+int is_player_near(struct Game *, struct Entity *, int);
+
+void change_random_velocity(struct Game *, struct Entity *);
+
+int update_entity_moveable(Strip *, struct Game *, struct Entity *, int, int);
+
+unsigned get_entity_tail_position(Strip *, struct Entity *, struct Game *);
+
+void try_readd_car(Strip *, struct Game *);
+
+void try_remove_car(Strip *, struct Entity *, struct Game *);
+
 void update_strip_moveable(Strip *, struct Game *);
 
 int is_entity_at(Entity *, unsigned, struct Game *);
@@ -54,6 +68,8 @@ Strip * create_strip_forest(struct Game *);
 
 Strip * create_strip_empty(struct Game *);
 
+void destroy_linked_list(struct Entity *);
+
 void destroy_strip(Strip *);
 
-#endif 
+#endif
