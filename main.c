@@ -10,8 +10,6 @@
 #define STORK_IMPLEMENTATION
 #include "stork.h"
 
-extern void read_player_name(struct Game * game);
-
 /*
  * IIII NN   N IIII TTTTTT 
  *  II  NNN  N  II  TTTTTT 

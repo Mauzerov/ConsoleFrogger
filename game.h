@@ -72,23 +72,19 @@ struct Game {
 
 int moveby(void *, int, int);
 
+void read_colors(struct Game *, FILE *);
+
 void read_textures(struct Game *, FILE *);
+
+void read_game_config(FILE * file, struct Config *, const char *);
 
 void read_config_file(struct Game *);
 
+void init_strips(struct Game *);
+
 void init_game(struct Game *);
 
-void render_leaderboard(struct Game *);
-
-void render_game_state(struct Game *);
-
-void render_border(WINDOW *, struct Game *);
-
-void render_game(struct Game *);
-
 void handle_player_collisions(struct Strip *, struct Game *);
-
-unsigned _P(int, struct Game *);
 
 void update_game(struct Game *);
 
@@ -97,5 +93,23 @@ void destroy_game(struct Game *);
 int empty_message_box(WINDOW *, int, int);
 
 void confirm(WINDOW *, const char *, int);
+
+void render_game_state(struct Game *);
+
+void render_border(WINDOW *, struct Game *);
+
+void render_game(struct Game *);
+
+void render_leaderboard(struct Game *);
+
+void add_player_to_leaderboard(const char *, unsigned long);
+
+void read_player_name(struct Game *);
+
+int read_leaderboard(Player[LEADERBOARD_SIZE]);
+
+void write_leaderboard(Player[LEADERBOARD_SIZE]);
+
+int order_players(const void *, const void *);
 
 #endif

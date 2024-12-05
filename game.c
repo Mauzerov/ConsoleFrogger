@@ -6,16 +6,6 @@
 #include "game.h"
 #include "stork.h"
 
-unsigned _P(int point, struct Game * game) {
-    while (point < 0)
-        point += game->size.x;
-    return point % game->size.x;
-}
-
-
-extern int read_leaderboard(Player[LEADERBOARD_SIZE]);
-extern void render_leaderboard(struct Game * game);
-
 /**
  *  CCCC   OOOOO  NN   N EEEEE IIII  GGGGG 
  * CC  CC OO   OO NNN  N EE     II  GG     
@@ -53,7 +43,7 @@ void read_textures(struct Game * game, FILE * file) {
     }
 }
 
-void read_game_config(FILE * file, struct Config * config, char * buffer) {
+void read_game_config(FILE * file, struct Config * config, const char * buffer) {
     ConfigRead(config, CARS_PER_STRIP);
     ConfigRead(config, LOGS_PER_STRIP);
     ConfigRead(config, TREES_PER_STRIP);
