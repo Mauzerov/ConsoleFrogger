@@ -40,10 +40,12 @@ void render_player(WINDOW * window, struct Game * game, int y_off) {
 
 void render_strip(WINDOW * window, Strip * self, struct Game * game, int y_off) {
     int cursor_x = game->cursor.x;
+    // Render Strip Background
     for (int i = 0; i < game->size.x; i++) {
         render_symbol(window, self->bg, self->bg_color, game, y_off);
         game->cursor.x++;
     }
+    // Render Entities
     struct Entity * head = self->entities;
     while (head != NULL) {
         for (unsigned i = 0; i < head->width; i++) {
@@ -83,11 +85,10 @@ void render_game_state(struct Game * game) {
         game->score,
         game->willing_to_travel ? "Waiting" : " Moving"
     );
-    mvwaddstr(window,
-        0, ((game->size.x * CELL_WIDTH - lenght + 2) >> 1),
-        buffer
-    );
+    // Display the formatted game state information at the top center of the window
+    mvwaddstr(window, 0, ((game->size.x * CELL_WIDTH - lenght + 2) >> 1), buffer);
         lenght = sprintf(buffer, " Author: Mateusz Mazurek | 203223 ");
+        // Display author information at the bottom center of the window
     mvwaddstr(window,
         game->config.VISIBLE_STRIPS * CELL_HEIGHT + 1,
         ((game->size.x * CELL_WIDTH - lenght + 2) >> 1),
@@ -117,7 +118,8 @@ void render_game(struct Game * game) {
     int scroll = clamp(
         0, game->player.y - game->config.VISIBLE_AHEAD, game->size.y - visibility
     );
-
+    // Render each visible strip and the stork if it is within the visible area
+    // to allow for a bigger playable area, scrolling is implemented
     for (int i = 0; i < visibility; i++) {
         game->cursor.y = i;
         game->cursor.x = 0;
@@ -152,11 +154,9 @@ void confirm(WINDOW * w, const char * message, int key) {
     int posy = (height - TEXT_BOX_HEIGHT) / 2;
     int posx = (width - TEXT_BOX_WIDTH) / 2;
 
-    keypad(w,  FALSE);
-    nodelay(w, FALSE);
+    ALLOW_INPUT(w, TRUE);
     posy = empty_message_box(w, posy, posx);
     mvwaddstr (w, height / 2 - 1, posx + 2, message);
-    while (wgetch(w) != key) ;
-    keypad(w,  TRUE);
-    nodelay(w, TRUE);
+    noecho(); while (wgetch(w) != key) ;
+    ALLOW_INPUT(w, FALSE);
 }

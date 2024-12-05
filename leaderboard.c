@@ -74,10 +74,7 @@ void add_player_to_leaderboard(
 void read_player_name(struct Game * game) {
     WINDOW * w = game->window;
     curs_set(1);
-    echo();
-
-    keypad(w,  FALSE);
-    nodelay(w, FALSE);
+    ALLOW_INPUT(w, TRUE);
 
     int posy, posx;
     getmaxyx(w, posy, posx);

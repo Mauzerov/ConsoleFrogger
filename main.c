@@ -72,10 +72,9 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
         (offx - INFO_PANEL_WIDTH) / 2
     );
 
-    nodelay(game->window, TRUE);
-    keypad(game->window,  TRUE);
+    ALLOW_INPUT(game->window, FALSE);
 
-    box(game_border, '#', '#');
+    box(game_border,      '#', '#');
     box(game->info_panel, '#', '#');
     wrefresh(game_border);
     wrefresh(game->info_panel);
@@ -85,7 +84,6 @@ WINDOW * initialize(struct Game * game) {
     WINDOW * main_window = initscr();
     start_color();
     curs_set(0);
-    noecho();
     
     read_config_file(game);
     const int seed = game->config.SEED ? game->config.SEED : time(NULL);

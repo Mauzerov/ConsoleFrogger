@@ -11,6 +11,13 @@
 #define SET_TEXTCOLOR(w, color)           wattron(w, COLOR_PAIR(color + COLOR_OFFSET * can_change_color()))
 #define SET_COLOR_PAIR(color, fore, back) init_pair(color + COLOR_OFFSET, fore + COLOR_OFFSET, back + COLOR_OFFSET)
 
+#define ALLOW_INPUT(window, flag) do {  \
+    if (flag) echo();                   \
+    else noecho();                      \
+    keypad(window,  !flag);             \
+    nodelay(window, !flag);             \
+} while (0)
+
 #endif
 
 #define SECONDS 1000
