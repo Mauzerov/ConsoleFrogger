@@ -24,9 +24,15 @@ int get_strip_index(Strip * self, Strip ** strips) {
 }
 
 int is_player_near(struct Game * game, struct Entity * head, int entity_y) {
-    return (abs(game->player.y - entity_y) <= 1) &&
-        abs(((int)game->player.x - (int)head->pos.x + game->size.x)
-                                               % game->size.x) <= 2;
+    // Check vertical proximity
+    int vertical_proximity = abs(game->player.y - entity_y) <= 1;
+
+    // Check horizontal proximity with wrap-around
+    int horizontal_distance = abs(game->player.x - head->pos.x);
+    int wrap_around_distance = game->size.x - horizontal_distance;
+    int horizontal_proximity = (horizontal_distance <= 2) || (wrap_around_distance <= 2);
+
+    return vertical_proximity && horizontal_proximity;
 }
 /**
  *  MM   MM  OOOOO  VV    VV  AA   BBBBB  LL    EEEEEE
@@ -62,7 +68,7 @@ int update_entity_moveable(
         }
         moveby(&head->pos.x, self->direction, game->size.x);
     } else {
-        player_near_car(head);
+        // player is near a car -> don't move the car
     }
     return player_moved;
 }
