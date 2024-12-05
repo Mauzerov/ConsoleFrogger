@@ -33,7 +33,8 @@ int read_leaderboard(Player leaderboard[LEADERBOARD_SIZE]) {
     while (fscanf(file, "%lu %19[^\n]",
         &leaderboard[leaderboard_count].score,
         leaderboard [leaderboard_count].name
-    ) == 2) leaderboard_count++;
+    ) == 2 && leaderboard_count < LEADERBOARD_SIZE)
+        leaderboard_count++;
     fclose(file);
 
     if (leaderboard_count > 1)
@@ -84,8 +85,7 @@ void read_player_name(struct Game * game) {
     posx = (posx - TEXT_BOX_WIDTH)  / 2;
     char name[MAX_NAME_SIZE] = { 0 };
     
-    int center = empty_message_box(w, posy, posx)
-               - TEXT_BOX_HEIGHT / 2 - 1;
+    int center = empty_message_box(w, posy, posx) - TEXT_BOX_HEIGHT / 2 - 1;
     
     mvwaddstr (w, center-1, posx + 8, "+  Winner  +");
     mvwaddstr (w, center,   posx + 2, "Name:");

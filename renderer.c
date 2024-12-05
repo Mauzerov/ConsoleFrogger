@@ -10,10 +10,11 @@ void render_symbol(
     struct Game * game,
     int y_off
 ) {
+    assert(symbol > 0);
+    
     SET_COLOR_PAIR(symbol, symbol, background);
     SET_TEXTCOLOR(window, symbol);
     
-    assert(symbol > 0);
     for (int i = 0; i < CELL_HEIGHT; i++) {
         for (int j = 0; j < CELL_WIDTH; j++) {
             mvwaddch(

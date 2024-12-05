@@ -121,13 +121,13 @@ void init_strips(struct Game * game) {
 
     int prev_direction = 0;
     for (int i = 0; i < game->size.y; i++) {
-        if (i % (game->size.y - 1) == 0) {
+        if (i == 0 || i == game->size.y - 1) {
             game->strips[i] = create_strip_empty(game);
             continue;
         }
         struct Strip * strip = StripConstructors[rand() % STRIP_COUNT](game);
 
-        // Force Movable Strip to be in opposite directions
+        // Ensure movable strip directions alternate
         if (strip->direction == prev_direction) {
             strip->direction *= -1;
         }
@@ -164,7 +164,7 @@ void init_game(struct Game * game) {
  *  UUUU  PP     DDDDD  AA  AA   TT   EEEEE
  **/
 
-unsigned handle_player_collisions(Strip * strip, struct Game * game) {
+void handle_player_collisions(Strip * strip, struct Game * game) {
     struct Entity * head = strip->entities;
     unsigned collisions = 0;
     while (head != NULL) {
@@ -174,7 +174,8 @@ unsigned handle_player_collisions(Strip * strip, struct Game * game) {
         }
         head = head->next;
     }
-    return collisions;
+    if (collisions == 0u && strip->collide == Evil)
+        end_game(game, LOSS);
 }
 
 void update_game(struct Game * game) {
@@ -186,18 +187,14 @@ void update_game(struct Game * game) {
         return; // if player won no need to check collisions
     }
     
-    if (handle_player_collisions(playerStrip, game) == 0u
-        && playerStrip->collide == Evil)
-        end_game(game, LOSS);
+    handle_player_collisions(playerStrip, game);
 
     for (int i = 0; i < game->size.y; i++) {
         if (game->strips[i]->velocity != 0)
             update_strip_moveable(game->strips[i], game);
     }
     // second call required, so that the fail screen isn't awkward
-    if (handle_player_collisions(playerStrip, game) == 0u
-        && playerStrip->collide == Evil)
-        end_game(game, LOSS);
+    handle_player_collisions(playerStrip, game);
 
     update_stork(game);
 }

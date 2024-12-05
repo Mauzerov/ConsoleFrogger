@@ -1,5 +1,3 @@
-#include <wchar.h>
-
 #include "engine.h"
 
 #include "strip.h"
@@ -203,7 +201,7 @@ Strip * _create_strip_movable(
         Entity entity = fg[rand() % n_fg];
         add_entity(self, &entity, game);
     }
-    self->entity_in_gulag = FALSE;
+    self->entity_in_gulag = NULL;
     return self;
 }
 

@@ -33,6 +33,5 @@ void end_game(struct Game *, int);
 
 void handle_entity_collision(struct Entity *, struct Game*);
 
-void player_near_car(struct Entity *);
 
 #endif

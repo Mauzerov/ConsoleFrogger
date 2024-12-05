@@ -6,12 +6,15 @@
 void init_stork(struct Game *);
 void update_stork(struct Game * game);
 
+#endif
 #ifdef STORK_IMPLEMENTATION
 
 void init_stork(struct Game * game) {
     struct Entity * stork = game->stork = calloc(1, sizeof(Entity));
+
     if ((stork->pos.x = game->config.STORK_X) < 0)
         stork->pos.x = rand() % game->size.x;
+
     stork->pos.y = game->size.y / 3;
     stork->velocity = game->config.STORK_VELOCITY;
 }
@@ -32,5 +35,4 @@ void update_stork(struct Game * game) {
     }
 }
 
-#endif
 #endif
