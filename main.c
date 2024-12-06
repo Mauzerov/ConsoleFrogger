@@ -80,6 +80,13 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
     wrefresh(game->info_panel);
 }
 
+void handle_recording(struct Game * game, int * key) {
+    if (game->recording_mode == PLAYING)
+        fscanf(game->recording, "%d", key);
+    if (game->recording_mode == RECORDING)
+        fprintf(game->recording, "%d\n", *key);
+}
+
 WINDOW * initialize(struct Game * game) {
     WINDOW * main_window = initscr();
     start_color();
@@ -88,10 +95,7 @@ WINDOW * initialize(struct Game * game) {
     read_config_file(game);
     int seed = game->config.SEED ? game->config.SEED : time(NULL);
 
-    if (game->recording_mode == RECORDING)
-        fprintf(game->recording, "%d\n",  seed);
-    else if (game->recording_mode == PLAYING)
-        fscanf(game->recording,   "%d", &seed);
+    handle_recording(game, &seed);
 
     srand(seed);
     init_game(game);
@@ -176,13 +180,6 @@ int time_passed(const struct timespec * time, unsigned long long it) {
     return time->tv_sec >= dt.quot && time->tv_nsec >= dt.rem;
 }
 
-void handle_key_recording(struct Game * game, int * key) {
-    if (game->recording_mode == PLAYING)
-        fscanf(game->recording, "%d", key);
-    if (game->recording_mode == RECORDING)
-        fprintf(game->recording, "%d\n", *key);
-}
-
 void main_loop(struct Game * game) {
     int key = ERR;
     struct timespec start, end;
@@ -201,7 +198,7 @@ void main_loop(struct Game * game) {
         }
         
         if (time_passed(&end, game->config.TIMEOUT * MICRO_SECONDS)) {
-            handle_key_recording(game, &key);
+            handle_recording(game, &key);
             handle_frame(game, key);
             clock_gettime(CLOCK_REALTIME, &start);
             key = ERR;
