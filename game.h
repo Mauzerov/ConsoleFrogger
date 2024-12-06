@@ -4,17 +4,20 @@
 #define MAX_GAME_WIDTH  25
 #define MAX_GAME_HEIGHT 100
 
-#define CELL_WIDTH 3
+#define CELL_WIDTH  3
 #define CELL_HEIGHT 2
 
-#define WIN 2
+#define WIN  2
 #define LOSS 1
+
+#define RECORDING 1
+#define PLAYING   2
 
 #define MAX_NAME_SIZE 20
 #define LEADERBOARD_FILENAME "frogger.score"
 #define LEADERBOARD_SIZE 5
 
-#define TEXT_BOX_WIDTH 28
+#define TEXT_BOX_WIDTH  28
 #define TEXT_BOX_HEIGHT 5
 
 #define INFO_PANEL_WIDTH  38
@@ -68,6 +71,8 @@ struct Game {
     unsigned long score;
     char textures[Symbol_Count][CELL_WIDTH * CELL_HEIGHT];
     short colors[Symbol_Count][3];
+    FILE * recording;
+    int recording_mode;
 };
 
 int moveby(void *, int, int);

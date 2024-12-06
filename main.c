@@ -86,7 +86,13 @@ WINDOW * initialize(struct Game * game) {
     curs_set(0);
     
     read_config_file(game);
-    const int seed = game->config.SEED ? game->config.SEED : time(NULL);
+    int seed = game->config.SEED ? game->config.SEED : time(NULL);
+
+    if (game->recording_mode == RECORDING)
+        fprintf(game->recording, "%d\n",  seed);
+    else if (game->recording_mode == PLAYING)
+        fscanf(game->recording,   "%d", &seed);
+
     srand(seed);
     init_game(game);
 
@@ -158,8 +164,8 @@ void handle_frame(struct Game * game, int key) {
 void handle_level_victory(struct Game * game) {
     game->level--;
     render_game(game);
-
-    confirm(game->window, "Press ENTER to continue!", 10);
+    if (game->recording_mode != PLAYING)
+        confirm(game->window, "Press ENTER to continue!", 10);
     destroy_game(game);
     init_game(game);
     game->over = 0;
@@ -168,6 +174,13 @@ void handle_level_victory(struct Game * game) {
 int time_passed(const struct timespec * time, unsigned long long it) {
     lldiv_t dt = lldiv(it, SECONDS * MICRO_SECONDS);
     return time->tv_sec >= dt.quot && time->tv_nsec >= dt.rem;
+}
+
+void handle_key_recording(struct Game * game, int * key) {
+    if (game->recording_mode == PLAYING)
+        fscanf(game->recording, "%d", key);
+    if (game->recording_mode == RECORDING)
+        fprintf(game->recording, "%d\n", *key);
 }
 
 void main_loop(struct Game * game) {
@@ -181,10 +194,14 @@ void main_loop(struct Game * game) {
         clock_gettime(CLOCK_REALTIME, &end);
         calculate_time_difference(&end, &start);
 
-        int _key = wgetch(game->window);
-        if (_key != ERR)
-            key = _key;
+        if (game->recording_mode != PLAYING) {
+            int _key = wgetch(game->window);
+            if (_key != ERR)
+                key = _key;    
+        }
+        
         if (time_passed(&end, game->config.TIMEOUT * MICRO_SECONDS)) {
+            handle_key_recording(game, &key);
             handle_frame(game, key);
             clock_gettime(CLOCK_REALTIME, &start);
             key = ERR;
@@ -200,8 +217,14 @@ void main_loop(struct Game * game) {
     render_game_state(game);
 }
 
-int main() {
+int main(int argc, const char ** argv) {
     struct Game game = { 0 };
+    if (argc > 1) {
+        if      ((game.recording = fopen(argv[1], "r")))
+            game.recording_mode = PLAYING;
+        else if ((game.recording = fopen(argv[1], "w")))
+            game.recording_mode = RECORDING;
+    }
     initialize(&game);
 
     main_loop(&game);
@@ -212,7 +235,9 @@ int main() {
     }
 
     destroy_game(&game);
+
+    if (game.recording)
+        fclose(game.recording);
     endwin();
-    
     return 0;
 }
