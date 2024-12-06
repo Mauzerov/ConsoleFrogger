@@ -94,7 +94,7 @@ void try_readd_vehicle(
     if (!random_chance(game->config.CHANCE_OF_CAR_DEATH)) 
         return;
     self->removed_entity->next = NULL;
-    add_entity_at_position(self, self->removed_entity, game, 0);
+    add_entity_at_position(self, self->removed_entity, 0);
     free(self->removed_entity);
     self->removed_entity = NULL;
 }
@@ -173,10 +173,9 @@ int is_entity_at(Entity * entity, unsigned index, struct Game * game) {
 void add_entity_at_position(
     Strip * self,
     Entity * entity,
-    struct Game * game,
     int position
 ) {
-    entity->pos.x = (position >= 0) ? position : rand() % game->size.x;
+    entity->pos.x = position;
     entity->velocity = self->velocity;
 
     if (self->entities == NULL){
@@ -195,7 +194,7 @@ void add_entity_at_position(
 
 
 void add_entity_to_strip(Strip * self, Entity * entity, struct Game * game) {
-    add_entity_at_position(self, entity, game, -1);
+    add_entity_at_position(self, entity, rand() % game->size.x);
 }
 
 Strip * _create_strip_movable(

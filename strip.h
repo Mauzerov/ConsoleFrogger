@@ -52,7 +52,7 @@ void update_strip_moveable(Strip *, struct Game *);
 
 int is_entity_at(Entity *, unsigned, struct Game *);
 
-void add_entity_at_position(Strip *, Entity *, struct Game *, int);
+void add_entity_at_position(Strip *, Entity *, int);
 
 void add_entity_to_strip(Strip *, Entity *, struct Game *);
 
