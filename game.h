@@ -67,7 +67,7 @@ struct Game {
     Player leaderboard[LEADERBOARD_SIZE];
     int leaderboard_count;
     int over, level;
-    int willing_to_travel;
+    int travel_willingness;
     unsigned long score;
     char textures[Symbol_Count][CELL_WIDTH * CELL_HEIGHT];
     short colors[Symbol_Count][3];

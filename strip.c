@@ -8,8 +8,8 @@
 Strip * _create_strip_common(struct Game * game) {
     Strip* self = calloc(1, sizeof(Strip));
 
-    self->bg = Null;
-    self->bg_color = Null;
+    self->background = Null;
+    self->background_color = Null;
     (void)game;
     return self;
 }
@@ -57,8 +57,8 @@ int update_entity_moveable(
     if (self->has_random_velocity)
         change_random_velocity(game, head);
 
-    int can_travel = game->willing_to_travel || head->symbol == Log;
-    if (!head->stop_when_player_near || !is_player_near(game, head, entity_y)) {
+    int can_travel = game->travel_willingness || head->symbol == Log;
+    if (!head->halt_near_player || !is_player_near(game, head, entity_y)) {
         // and move player along if wasn't moved already
         if (game->player.y == entity_y &&
             !player_moved &&
@@ -85,26 +85,26 @@ unsigned get_entity_tail_position(
     return entity->pos.x;
 }
 
-void try_readd_car(
+void try_readd_vehicle(
     Strip * self,
     struct Game * game
 ) {
-    if (!self->entity_in_gulag)
+    if (!self->removed_entity)
         return;
     if (!random_chance(game->config.CHANCE_OF_CAR_DEATH)) 
         return;
-    self->entity_in_gulag->next = NULL;
-    add_entity_at(self, self->entity_in_gulag, game, 0);
-    free(self->entity_in_gulag);
-    self->entity_in_gulag = NULL;
+    self->removed_entity->next = NULL;
+    add_entity_at_position(self, self->removed_entity, game, 0);
+    free(self->removed_entity);
+    self->removed_entity = NULL;
 }
 
-void try_remove_car(
+void try_remove_vehicle(
     Strip * self,
     struct Entity * entity,
     struct Game * game
 ) {
-    if (self->entity_in_gulag)
+    if (self->removed_entity)
         return;
     if (get_entity_tail_position(self, entity, game) != 0u)
         return;
@@ -112,7 +112,7 @@ void try_remove_car(
         return;
 
     assert(entity != NULL);
-    self->entity_in_gulag = entity;
+    self->removed_entity = entity;
 
     struct Entity * head = self->entities;
     if (self->entities == entity)
@@ -143,8 +143,8 @@ void update_strip_moveable(Strip * self, struct Game * game) {
                 strip_y, player_moved
             );
             if (head->symbol != Log){
-                try_remove_car(self, head, game);
-                try_readd_car(self,  game);
+                try_remove_vehicle(self, head, game);
+                try_readd_vehicle(self,  game);
             }
         }
         head = head->next;
@@ -170,7 +170,7 @@ int is_entity_at(Entity * entity, unsigned index, struct Game * game) {
     return start <= index || index < end;
 }
 
-void add_entity_at(
+void add_entity_at_position(
     Strip * self,
     Entity * entity,
     struct Game * game,
@@ -194,12 +194,12 @@ void add_entity_at(
 }
 
 
-void add_entity(Strip * self, Entity * entity, struct Game * game) {
-    add_entity_at(self, entity, game, -1);
+void add_entity_to_strip(Strip * self, Entity * entity, struct Game * game) {
+    add_entity_at_position(self, entity, game, -1);
 }
 
 Strip * _create_strip_movable(
-    Symbol bg, 
+    Symbol background, 
     Entity * fg, size_t n_fg, size_t fg_count,
     struct Game * game
 ) {
@@ -208,13 +208,13 @@ Strip * _create_strip_movable(
     self->direction = random_chance(50) ? UPDATE_RIGHT : UPDATE_LEFT;
     self->velocity  = random_chance(game->config.CHANCE_OF_SLOW_STRIP)
                     ? game->config.SLOW_VELOCITY : game->config.NORMAL_VELOCITY;
-    self->bg = bg;
+    self->background = background;
 
     for (size_t i = 0; i < fg_count; i++) {
         Entity entity = fg[rand() % n_fg];
-        add_entity(self, &entity, game);
+        add_entity_to_strip(self, &entity, game);
     }
-    self->entity_in_gulag = NULL;
+    self->removed_entity = NULL;
     return self;
 }
 
@@ -240,12 +240,12 @@ Strip * create_strip_river(struct Game * game) {
         game
     );
     if (can_change_color()) {
-        const short * bg_color = game->colors[Water];
-        self->bg_color = define_new_color(bg_color[0] * .55, bg_color[1]* .55, bg_color[2]* .55);
+        const short * background_color = game->colors[Water];
+        self->background_color = define_new_color(background_color[0] * .55, background_color[1]* .55, background_color[2]* .55);
     } else {
-        self->bg_color = COLOR_BLUE;
+        self->background_color = COLOR_BLUE;
     }
-    self->collide = Evil;
+    self->collision_type = Evil;
     return self;
 }
 
@@ -263,7 +263,7 @@ Strip * create_strip_road(struct Game * game) {
     Entity fg[] = {
         { Car,  .width = 1, .type = Evil },
         { Car,  .width = 1, .type = Evil,
-                .stop_when_player_near = TRUE },
+                .halt_near_player = TRUE },
         { Taxi, .width = 1 }
     };
     Strip * self = _create_strip_movable(
@@ -292,7 +292,7 @@ Strip * create_strip_forest(struct Game * game) {
     Strip * self = _create_strip_common(game);
 
     for (int i = 0 ; i < game->config.TREES_PER_STRIP; i++) {
-        add_entity(self, fg, game);
+        add_entity_to_strip(self, fg, game);
     }
     return self;
 }
@@ -309,17 +309,17 @@ Strip * create_strip_empty(struct Game * game) {
  * DDDDD  EEEEE SSSSS    TT   RR  RR  UUUU   CCCC    TT  
  **/
 
-void destroy_linked_list(struct Entity * entity) {
+void free_entity_list(struct Entity * entity) {
     if (entity != NULL) {
-        destroy_linked_list(entity->next);
+        free_entity_list(entity->next);
         free(entity);
     }
 }
 
-void destroy_strip(Strip * self) {
-    destroy_linked_list(self->entities);
-    if (self->entity_in_gulag)
-        free(self->entity_in_gulag);
+void free_strip(Strip * self) {
+    free_entity_list(self->entities);
+    if (self->removed_entity)
+        free(self->removed_entity);
     free(self);
 }
 

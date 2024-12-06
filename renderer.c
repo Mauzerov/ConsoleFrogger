@@ -29,20 +29,20 @@ void render_symbol(
 
 void render_stork(WINDOW * window, struct Game * game, int y_off) {
     struct Point * stork = &game->stork->pos;
-    Symbol bg = game->strips[stork->y]->bg_color;
+    Symbol background = game->strips[stork->y]->background_color;
 
-    render_symbol(window, Stork, bg, game, y_off);
+    render_symbol(window, Stork, background, game, y_off);
 }
 
 void render_player(WINDOW * window, struct Game * game, int y_off) {
-    render_symbol(window, Frog, game->strips[game->player.y]->bg_color, game, y_off);
+    render_symbol(window, Frog, game->strips[game->player.y]->background_color, game, y_off);
 }
 
 void render_strip(WINDOW * window, Strip * self, struct Game * game, int y_off) {
     int cursor_x = game->cursor.x;
     // Render Strip Background
     for (int i = 0; i < game->size.x; i++) {
-        render_symbol(window, self->bg, self->bg_color, game, y_off);
+        render_symbol(window, self->background, self->background_color, game, y_off);
         game->cursor.x++;
     }
     // Render Entities
@@ -50,7 +50,7 @@ void render_strip(WINDOW * window, Strip * self, struct Game * game, int y_off) 
     while (head != NULL) {
         for (unsigned i = 0; i < head->width; i++) {
             game->cursor.x = cursor_x + (head->pos.x + i) % game->size.x;
-            render_symbol(window, head->symbol, self->bg_color, game, y_off);
+            render_symbol(window, head->symbol, self->background_color, game, y_off);
         }
         head = head->next;
     }
@@ -83,7 +83,7 @@ void render_game_state(struct Game * game) {
         " Level %d | Score: %05lu | %s ",
         game->config.LEVEL_COUNT - game->level + 1,
         game->score,
-        game->willing_to_travel ? "Waiting" : " Moving"
+        game->travel_willingness ? "Waiting" : " Moving"
     );
     // Display the formatted game state information at the top center of the window
     mvwaddstr(window, 0, ((game->size.x * CELL_WIDTH - length + 2) >> 1), buffer);

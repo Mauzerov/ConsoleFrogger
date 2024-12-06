@@ -17,13 +17,13 @@ struct Game;
 
 struct Strip {
     struct Entity * entities; // Linked List
-    Symbol bg, bg_color;      // Strip can only have one backgroud (more is unnecessary)
-    CellType collide;
+    Symbol background, background_color;      // Strip can only have one backgroud (more is unnecessary)
+    CellType collision_type;
     
     // Movable Strip definition
     int direction;
     int has_random_velocity, velocity;
-    struct Entity * entity_in_gulag;
+    struct Entity * removed_entity;
 };
 
 typedef struct Strip Strip;
@@ -44,17 +44,17 @@ int update_entity_moveable(Strip *, struct Game *, struct Entity *, int, int);
 
 unsigned get_entity_tail_position(Strip *, struct Entity *, struct Game *);
 
-void try_readd_car(Strip *, struct Game *);
+void try_readd_vehicle(Strip *, struct Game *);
 
-void try_remove_car(Strip *, struct Entity *, struct Game *);
+void try_remove_vehicle(Strip *, struct Entity *, struct Game *);
 
 void update_strip_moveable(Strip *, struct Game *);
 
 int is_entity_at(Entity *, unsigned, struct Game *);
 
-void add_entity_at(Strip *, Entity *, struct Game *, int);
+void add_entity_at_position(Strip *, Entity *, struct Game *, int);
 
-void add_entity(Strip *, Entity *, struct Game *);
+void add_entity_to_strip(Strip *, Entity *, struct Game *);
 
 int get_strip_index(Strip *, Strip **);
 
@@ -68,8 +68,8 @@ Strip * create_strip_forest(struct Game *);
 
 Strip * create_strip_empty(struct Game *);
 
-void destroy_linked_list(struct Entity *);
+void free_entity_list(struct Entity *);
 
-void destroy_strip(Strip *);
+void free_strip(Strip *);
 
 #endif

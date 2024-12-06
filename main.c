@@ -134,7 +134,7 @@ void handle_key_down(struct Game * game, int keycode) {
             game->prev_move.x = -(game->player.x > 0);
     } else
     if (keycode == ' ') {
-        game->willing_to_travel ^= TRUE;
+        game->travel_willingness ^= TRUE;
     }
 }
 

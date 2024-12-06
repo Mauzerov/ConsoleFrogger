@@ -166,7 +166,7 @@ void handle_player_collisions(Strip * strip, struct Game * game) {
         }
         head = head->next;
     }
-    if (collisions == 0u && strip->collide == Evil)
+    if (collisions == 0u && strip->collision_type == Evil)
         end_game(game, LOSS);
 }
 
@@ -201,7 +201,7 @@ void update_game(struct Game * game) {
 
 void destroy_game(struct Game * game) {
     for (int i = 0; i < game->size.y; i++) {
-        destroy_strip(game->strips[i]);
+        free_strip(game->strips[i]);
     }
     free(game->stork);
     free(game->strips);
