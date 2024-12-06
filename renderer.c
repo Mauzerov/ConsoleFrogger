@@ -78,7 +78,7 @@ void render_game_state(struct Game * game) {
     
     char buffer[MAX_GAME_WIDTH * CELL_WIDTH] = { 0 };
 
-    int lenght = sprintf(
+    int length = sprintf(
         buffer,
         " Level %d | Score: %05lu | %s ",
         game->config.LEVEL_COUNT - game->level + 1,
@@ -86,12 +86,12 @@ void render_game_state(struct Game * game) {
         game->willing_to_travel ? "Waiting" : " Moving"
     );
     // Display the formatted game state information at the top center of the window
-    mvwaddstr(window, 0, ((game->size.x * CELL_WIDTH - lenght + 2) >> 1), buffer);
-        lenght = sprintf(buffer, " Author: Mateusz Mazurek | 203223 ");
+    mvwaddstr(window, 0, ((game->size.x * CELL_WIDTH - length + 2) >> 1), buffer);
+        length = sprintf(buffer, " Author: Mateusz Mazurek | 203223 ");
         // Display author information at the bottom center of the window
     mvwaddstr(window,
         game->config.VISIBLE_STRIPS * CELL_HEIGHT + 1,
-        ((game->size.x * CELL_WIDTH - lenght + 2) >> 1),
+        ((game->size.x * CELL_WIDTH - length + 2) >> 1),
         buffer
     );
 }

@@ -34,11 +34,11 @@ void read_textures(struct Game * game, FILE * file) {
     const int size = CELL_WIDTH * CELL_HEIGHT;
     char c;
     for (int i = 1; i < Symbol_Count; i++) {
-        int lenght = 0;
-        while (lenght < size) {
+        int length = 0;
+        while (length < size) {
             fscanf(file, "%c", &c);
             if (c == '\n') continue;
-            game->textures[i][lenght++] = c;
+            game->textures[i][length++] = c;
         }
     }
 }
