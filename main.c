@@ -42,7 +42,7 @@ void init_custom_colors(const struct Game * game) {
         init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
         init_pair(Stork,  COLOR_WHITE , COLOR_BLACK);
     } else {
-        for (int i = 0; i < Symbol_Count; i++) {
+        for (int i = 1; i < Symbol_Count; i++) {
             DEFINE_COLOR(i, game->colors[i][0], game->colors[i][1], game->colors[i][2]);
         }
     }
@@ -72,7 +72,6 @@ void init_sub_windows(struct Game * game, WINDOW * main_window) {
         game->config.VISIBLE_STRIPS * CELL_HEIGHT + 2,
         (offx - INFO_PANEL_WIDTH) / 2
     );
-
     ALLOW_INPUT(game->window, FALSE);
 
     box(game_border,      '#', '#');

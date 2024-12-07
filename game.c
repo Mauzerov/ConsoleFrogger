@@ -20,7 +20,7 @@
     }
 
 void read_colors(struct Game * game, FILE * file) {
-    for (int i = 0; i < Symbol_Count; i++) {
+    for (int i = 1; i < Symbol_Count; i++) {
         short r, g, b;
         fscanf(file, " rgb( %hd , %hd , %hd )", &r, &g, &b);
         game->colors[i][0] = linear_scale_rgb(r);
