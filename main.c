@@ -40,6 +40,7 @@ void init_custom_colors(const struct Game * game) {
         init_pair(Car  ,  COLOR_RED   , COLOR_BLACK);
         init_pair(Taxi ,  COLOR_YELLOW, COLOR_BLACK);
         init_pair(Curb ,  COLOR_WHITE , COLOR_BLACK);
+        init_pair(Stork ,  COLOR_WHITE , COLOR_BLACK);
     } else {
         for (int i = 0; i < Symbol_Count; i++) {
             DEFINE_COLOR(i, game->colors[i][0], game->colors[i][1], game->colors[i][2]);
