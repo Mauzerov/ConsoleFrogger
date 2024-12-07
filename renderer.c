@@ -137,8 +137,8 @@ void render_game(struct Game * game) {
 }
 
 int empty_message_box(WINDOW * w, int posy, int posx) {
-    SET_COLOR_PAIR(Border, Border, Null);
-    SET_TEXTCOLOR(w, Border);
+    SET_COLOR_PAIR(Frog, Frog, Null);
+    SET_TEXTCOLOR(w, Frog);
 
     mvwaddstr (w, posy++, posx, "                            ");
     mvwaddstr (w, posy++, posx, " +========================+ ");
